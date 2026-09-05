@@ -1,0 +1,73 @@
+// Seed applications for the demo account. Tracking status is simulated for this prototype.
+const mockApplications = [
+  {
+    id: 'PSP-2026-10234',
+    name: 'Passport Application',
+    type: 'DIGITAL_SERVICE',
+    serviceId: 'passport',
+    department: 'Ministry of External Affairs',
+    status: 'Under Review',
+    submittedDate: '2026-08-10',
+    lastUpdated: '2026-08-25',
+    timeline: [
+      { step: 'Application Submitted', done: true, date: '2026-08-10' },
+      { step: 'Documents Received', done: true, date: '2026-08-14' },
+      { step: 'Verification', done: false, current: true },
+      { step: 'Department Processing', done: false },
+      { step: 'Final Decision', done: false },
+    ],
+  },
+  {
+    id: 'INC-2026-55821',
+    name: 'Income Certificate',
+    type: 'DIGITAL_SERVICE',
+    serviceId: 'income-certificate',
+    department: 'State e-District Portal',
+    status: 'Approved',
+    submittedDate: '2026-07-02',
+    lastUpdated: '2026-07-20',
+    timeline: [
+      { step: 'Application Submitted', done: true, date: '2026-07-02' },
+      { step: 'Documents Received', done: true, date: '2026-07-05' },
+      { step: 'Verification', done: true, date: '2026-07-12' },
+      { step: 'Department Processing', done: true, date: '2026-07-18' },
+      { step: 'Final Decision', done: true, date: '2026-07-20' },
+    ],
+  },
+  {
+    id: 'DL-2026-77190',
+    name: 'Driving Licence Application',
+    type: 'DIGITAL_SERVICE',
+    serviceId: 'driving-licence',
+    department: 'Ministry of Road Transport & Highways',
+    status: 'Processing',
+    submittedDate: '2026-08-20',
+    lastUpdated: '2026-08-28',
+    timeline: [
+      { step: 'Application Submitted', done: true, date: '2026-08-20' },
+      { step: 'Documents Received', done: true, date: '2026-08-22' },
+      { step: 'Verification', done: true, date: '2026-08-26' },
+      { step: 'Department Processing', done: false, current: true },
+      { step: 'Final Decision', done: false },
+    ],
+  },
+  {
+    id: 'SES-2026-30456',
+    name: 'Student Education Support Scheme',
+    type: 'SCHEME',
+    schemeId: 'student-education-support',
+    department: 'Department of School Education (Demo)',
+    status: 'Submitted',
+    submittedDate: '2026-08-30',
+    lastUpdated: '2026-08-30',
+    timeline: [
+      { step: 'Application Submitted', done: true, date: '2026-08-30' },
+      { step: 'Documents Received', done: false, current: true },
+      { step: 'Verification', done: false },
+      { step: 'Department Processing', done: false },
+      { step: 'Final Decision', done: false },
+    ],
+  },
+];
+
+export default mockApplications;
