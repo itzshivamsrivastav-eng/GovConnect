@@ -3,7 +3,6 @@ import {
   Landmark,
   Award,
   ClipboardList,
-  FileText,
   ShieldCheck,
   ArrowRight,
   CheckCircle2,
@@ -22,7 +21,6 @@ import { getCurrentUser } from '../services/authApi';
 import { getApplications } from '../services/applicationApi';
 import { getRankedSchemes } from '../services/schemeApi';
 import { getProfile } from '../services/profileApi';
-import { calcProfileCompletion } from '../utils/format';
 
 const QUICK_ACTIONS = [
   {
@@ -44,12 +42,6 @@ const QUICK_ACTIONS = [
     desc: 'Track all your applications',
   },
   {
-    to: '/documents',
-    icon: FileText,
-    title: 'My Documents',
-    desc: 'View reusable documents',
-  },
-  {
     to: '/consent',
     icon: ShieldCheck,
     title: 'Consent Center',
@@ -57,24 +49,173 @@ const QUICK_ACTIONS = [
   },
 ];
 
-const ACTIVITY = [
-  {
-    text: 'Passport application status updated',
-    time: '2 hours ago',
-  },
-  {
-    text: 'Income Certificate approved',
-    time: '1 day ago',
-  },
-  {
-    text: 'New scheme recommendation available',
-    time: '2 days ago',
-  },
-  {
-    text: 'Profile information updated',
-    time: '5 days ago',
-  },
-];
+function calcProfileCompletion(profile) {
+  if (!profile) return 0;
+
+  const fields = [
+    'fullName',
+    'fatherName',
+    'motherName',
+    'dob',
+    'gender',
+    'mobile',
+    'email',
+    'address',
+    'state',
+    'district',
+    'city',
+    'pincode',
+    'educationLevel',
+    'institutionName',
+    'course',
+    'studentStatus',
+    'occupation',
+    'employmentType',
+    'annualIncome',
+    'incomeCategory',
+    'category',
+    'maritalStatus',
+  ];
+
+  const completed = fields.filter(
+    (field) =>
+      profile[field] !== undefined &&
+      profile[field] !== null &&
+      String(profile[field]).trim() !== ''
+  ).length;
+
+  return Math.round(
+    (completed / fields.length) * 100
+  );
+}
+
+function formatActivityDate(date) {
+  if (!date) return '';
+
+  const activityDate = new Date(date);
+
+  if (Number.isNaN(activityDate.getTime())) {
+    return date;
+  }
+
+  return activityDate.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function getActivityInfo(step, application) {
+  if (step === 'Application Submitted') {
+    return {
+      text: `${application.name} application submitted`,
+      icon: CheckCircle2,
+    };
+  }
+
+  if (step === 'Documents Received') {
+    return {
+      text: `Documents received for ${application.name}`,
+      icon: CheckCircle2,
+    };
+  }
+
+  if (step === 'Verification') {
+    return {
+      text: `${application.name} is under verification`,
+      icon: Clock3,
+    };
+  }
+
+  if (step === 'Department Processing') {
+    return {
+      text: `${application.name} is being processed`,
+      icon: Clock3,
+    };
+  }
+
+  if (step === 'Final Decision') {
+    if (application.status === 'Approved') {
+      return {
+        text: `${application.name} application approved`,
+        icon: CheckCircle2,
+      };
+    }
+
+    if (application.status === 'Rejected') {
+      return {
+        text: `${application.name} application rejected`,
+        icon: Clock3,
+      };
+    }
+
+    return {
+      text: `${application.name} final decision updated`,
+      icon: Clock3,
+    };
+  }
+
+  return {
+    text: `${application.name} status updated`,
+    icon: Clock3,
+  };
+}
+
+function buildRecentActivities(applications) {
+  if (!applications || applications.length === 0) {
+    return [];
+  }
+
+  const activities = [];
+
+  applications.forEach((application) => {
+    const timeline = application.timeline || [];
+
+    timeline.forEach((step) => {
+      if (!step.date) return;
+
+      const activityInfo = getActivityInfo(
+        step.step,
+        application
+      );
+
+      activities.push({
+        id: `${application.id}-${step.step}-${step.date}`,
+        applicationId: application.id,
+        text: activityInfo.text,
+        icon: activityInfo.icon,
+        date: step.date,
+      });
+    });
+
+    if (
+      application.lastUpdated &&
+      !timeline.some(
+        (step) => step.date === application.lastUpdated
+      )
+    ) {
+      const activityInfo = getActivityInfo(
+        'Application Updated',
+        application
+      );
+
+      activities.push({
+        id: `${application.id}-updated-${application.lastUpdated}`,
+        applicationId: application.id,
+        text: activityInfo.text,
+        icon: activityInfo.icon,
+        date: application.lastUpdated,
+      });
+    }
+  });
+
+  return activities
+    .sort(
+      (a, b) =>
+        new Date(b.date) - new Date(a.date)
+    )
+    .slice(0, 5);
+}
 
 export default function Dashboard() {
   const user = getCurrentUser();
@@ -85,10 +226,6 @@ export default function Dashboard() {
   const topSchemes = ranked.slice(0, 3);
 
   const completion = calcProfileCompletion(profile);
-
-  // ============================================================
-  // APPLICATION STATUS COUNTS
-  // ============================================================
 
   const completedCount = applications.filter(
     (app) => app.status === 'Approved'
@@ -103,38 +240,26 @@ export default function Dashboard() {
 
   const totalApplications = applications.length;
 
-  // ============================================================
-  // ELIGIBILITY
-  // matchingEngine already calculates likelyEligible.
-  // 60%+ match = Likely Eligible.
-  // ============================================================
-
   const eligibleSchemes = ranked.filter(
     ({ match }) => match.likelyEligible
   ).length;
 
   const availableSchemes = ranked.length;
 
-  // ============================================================
-  // DONUT CHART
-  // ============================================================
-
   const completedPercentage =
     totalApplications > 0
-      ? Math.round((completedCount / totalApplications) * 100)
+      ? Math.round(
+          (completedCount / totalApplications) * 100
+        )
       : 0;
 
-  const pendingPercentage =
-    totalApplications > 0
-      ? 100 - completedPercentage
-      : 0;
+  const recentActivities =
+    buildRecentActivities(applications);
 
   return (
     <DashboardLayout>
 
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
+      {/* HEADER */}
 
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -173,62 +298,59 @@ export default function Dashboard() {
       </div>
 
 
-      {/* =====================================================
-          QUICK ACTIONS
-      ====================================================== */}
+      {/* QUICK ACTIONS */}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
 
-        {QUICK_ACTIONS.map(({ to, icon: Icon, title, desc }) => (
+        {QUICK_ACTIONS.map(
+          ({ to, icon: Icon, title, desc }) => (
 
-          <Link
-            key={to}
-            to={to}
-            className="group rounded-xl border border-gray-200 bg-white p-4 hover:border-navy-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-          >
+            <Link
+              key={to}
+              to={to}
+              className="group rounded-xl border border-gray-200 bg-white p-4 hover:border-navy-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            >
 
-            <div className="w-10 h-10 rounded-lg bg-gray-50 group-hover:bg-navy-50 flex items-center justify-center mb-3 transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-gray-50 group-hover:bg-navy-50 flex items-center justify-center mb-3 transition-colors">
 
-              <Icon
-                size={20}
-                className="text-navy-700"
-              />
+                <Icon
+                  size={20}
+                  className="text-navy-700"
+                />
 
-            </div>
+              </div>
 
-            <p className="text-sm font-semibold text-navy-900">
-              {title}
-            </p>
+              <p className="text-sm font-semibold text-navy-900">
+                {title}
+              </p>
 
-            <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-              {desc}
-            </p>
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                {desc}
+              </p>
 
-          </Link>
+            </Link>
 
-        ))}
+          )
+        )}
 
       </div>
 
 
       {/* =====================================================
-          MAIN DASHBOARD
+          MAIN CONTENT
       ====================================================== */}
 
-      <div className="grid lg:grid-cols-3 gap-6 mb-6 items-start">
+      <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mb-8">
 
         {/* ===================================================
-            LEFT SIDE
+            LEFT COLUMN
         ==================================================== */}
 
-        <div className="lg:col-span-2 space-y-6">
+        <div>
 
+          {/* MY APPLICATIONS */}
 
-          {/* -------------------------------------------------
-              MY APPLICATIONS
-          -------------------------------------------------- */}
-
-          <section>
+          <section className="mb-6">
 
             <div className="flex items-center justify-between mb-3">
 
@@ -254,7 +376,6 @@ export default function Dashboard() {
 
             </div>
 
-
             {applications.length === 0 ? (
 
               <EmptyState
@@ -274,14 +395,16 @@ export default function Dashboard() {
 
               <div className="grid sm:grid-cols-2 gap-4">
 
-                {applications.slice(0, 4).map((app) => (
+                {applications.slice(0, 4).map(
+                  (app) => (
 
-                  <ApplicationCard
-                    key={app.id}
-                    application={app}
-                  />
+                    <ApplicationCard
+                      key={app.id}
+                      application={app}
+                    />
 
-                ))}
+                  )
+                )}
 
               </div>
 
@@ -290,11 +413,9 @@ export default function Dashboard() {
           </section>
 
 
-          {/* -------------------------------------------------
-              APPLICATION OVERVIEW
-          -------------------------------------------------- */}
+          {/* APPLICATION OVERVIEW */}
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm mb-6">
 
             <div className="flex items-center justify-between mb-5">
 
@@ -322,7 +443,7 @@ export default function Dashboard() {
 
             <div className="grid md:grid-cols-2 gap-6 items-center">
 
-              {/* DONUT */}
+              {/* PIE CHART */}
 
               <div className="flex items-center justify-center">
 
@@ -360,11 +481,9 @@ export default function Dashboard() {
               </div>
 
 
-              {/* STATUS + SCHEME STATS */}
+              {/* STATUS */}
 
               <div className="space-y-3">
-
-                {/* Completed */}
 
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
 
@@ -393,8 +512,6 @@ export default function Dashboard() {
                 </div>
 
 
-                {/* Pending */}
-
                 <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-3">
 
                   <div className="flex items-center gap-3">
@@ -422,8 +539,6 @@ export default function Dashboard() {
                 </div>
 
 
-                {/* Eligible */}
-
                 <div className="flex items-center justify-between rounded-lg bg-green-50 px-4 py-3">
 
                   <div className="flex items-center gap-3">
@@ -450,8 +565,6 @@ export default function Dashboard() {
 
                 </div>
 
-
-                {/* Available */}
 
                 <div className="flex items-center justify-between rounded-lg bg-blue-50 px-4 py-3">
 
@@ -486,11 +599,9 @@ export default function Dashboard() {
           </section>
 
 
-          {/* -------------------------------------------------
-              PROFILE COMPLETION
-          -------------------------------------------------- */}
+          {/* PROFILE COMPLETION */}
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm mb-6">
 
             <div className="flex items-center justify-between mb-3">
 
@@ -512,14 +623,11 @@ export default function Dashboard() {
 
             </div>
 
-
             <ProgressBar percent={completion} />
-
 
             <p className="text-xs text-gray-500 mt-3 mb-4">
               Complete your profile to get better scheme recommendations.
             </p>
-
 
             {completion < 100 && (
 
@@ -548,14 +656,100 @@ export default function Dashboard() {
 
           </section>
 
+
+          {/* RECENT ACTIVITY */}
+
+          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <div>
+
+                <h3 className="font-heading font-semibold text-navy-900">
+                  Recent Activity
+                </h3>
+
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Latest updates from your applications
+                </p>
+
+              </div>
+
+              <span className="text-xs font-medium text-gray-400">
+                Latest
+              </span>
+
+            </div>
+
+            {recentActivities.length === 0 ? (
+
+              <div className="rounded-lg bg-gray-50 px-4 py-6 text-center">
+
+                <p className="text-sm text-gray-500">
+                  No recent activity.
+                </p>
+
+              </div>
+
+            ) : (
+
+              <ul className="grid md:grid-cols-2 gap-3">
+
+                {recentActivities.map(
+                  (activity) => {
+
+                    const Icon = activity.icon;
+
+                    return (
+                      <li
+                        key={activity.id}
+                        className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 hover:bg-gray-100 px-4 py-3 transition-colors"
+                      >
+
+                        <Link
+                          to={`/applications/${activity.applicationId}`}
+                          className="flex items-center gap-3 min-w-0 flex-1"
+                        >
+
+                          <div className="w-7 h-7 rounded-full bg-navy-50 flex items-center justify-center shrink-0">
+
+                            <Icon
+                              size={14}
+                              className="text-navy-700"
+                            />
+
+                          </div>
+
+                          <span className="text-sm text-gray-700 truncate">
+                            {activity.text}
+                          </span>
+
+                        </Link>
+
+                        <span className="text-xs text-gray-400 shrink-0">
+                          {formatActivityDate(activity.date)}
+                        </span>
+
+                      </li>
+                    );
+
+                  }
+                )}
+
+              </ul>
+
+            )}
+
+          </section>
+
         </div>
 
 
         {/* ===================================================
-            RIGHT SIDE
+            RIGHT COLUMN - RECOMMENDED SCHEMES
         ==================================================== */}
 
-        <div>
+        <section>
 
           <div className="flex items-center justify-between mb-3">
 
@@ -581,95 +775,28 @@ export default function Dashboard() {
 
           </div>
 
-
           <div className="space-y-4">
 
-            {topSchemes.map(({ scheme, match }) => (
+            {topSchemes.map(
+              ({ scheme, match }) => (
 
-              <SchemeCard
-                key={scheme.id}
-                scheme={scheme}
-                match={match}
-              />
+                <SchemeCard
+                  key={scheme.id}
+                  scheme={scheme}
+                  match={match}
+                />
 
-            ))}
+              )
+            )}
 
           </div>
 
-        </div>
+        </section>
 
       </div>
 
 
-      {/* =====================================================
-          RECENT ACTIVITY
-      ====================================================== */}
-
-      <section className="rounded-xl border border-gray-200 bg-white p-5 mb-8 shadow-sm">
-
-        <div className="flex items-center justify-between mb-4">
-
-          <div>
-
-            <h3 className="font-heading font-semibold text-navy-900">
-              Recent Activity
-            </h3>
-
-            <p className="text-xs text-gray-500 mt-0.5">
-              Your latest updates
-            </p>
-
-          </div>
-
-          <span className="text-xs font-medium text-gray-400">
-            Latest
-          </span>
-
-        </div>
-
-
-        <ul className="grid md:grid-cols-2 gap-3">
-
-          {ACTIVITY.map((a, idx) => (
-
-            <li
-              key={idx}
-              className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 hover:bg-gray-100 px-4 py-3 transition-colors"
-            >
-
-              <div className="flex items-center gap-3 min-w-0">
-
-                <div className="w-7 h-7 rounded-full bg-navy-50 flex items-center justify-center shrink-0">
-
-                  <CheckCircle2
-                    size={14}
-                    className="text-navy-700"
-                  />
-
-                </div>
-
-                <span className="text-sm text-gray-700 truncate">
-                  {a.text}
-                </span>
-
-              </div>
-
-              <span className="text-xs text-gray-400 shrink-0">
-                {a.time}
-              </span>
-
-            </li>
-
-          ))}
-
-        </ul>
-
-      </section>
-
-
-      {/* =====================================================
-          UNIFIED TRACKING
-      ====================================================== */}
+      {/* UNIFIED TRACKING */}
 
       <UnifiedTrackingBanner />
 
