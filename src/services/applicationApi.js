@@ -1,39 +1,26 @@
-import {
-  getUserItem,
-  setUserItem,
-  STORAGE_KEYS,
-} from '../utils/storage';
-
-export function getApplications() {
-  return getUserItem(
-    STORAGE_KEYS.APPLICATIONS,
-    null,
-    []
-  );
-}
+import { getItem, setItem, STORAGE_KEYS } from '../utils/storage';
 
 export function seedApplicationsIfEmpty(seed) {
-  const existing = getApplications();
+  const existing = getItem(STORAGE_KEYS.APPLICATIONS, null);
 
   if (!existing || existing.length === 0) {
-    setUserItem(STORAGE_KEYS.APPLICATIONS, seed);
+    setItem(STORAGE_KEYS.APPLICATIONS, seed);
   }
 }
 
-export function getApplicationById(id) {
-  return getApplications().find(
-    (application) => application.id === id
-  ) || null;
+export function getApplications() {
+  return getItem(STORAGE_KEYS.APPLICATIONS, []);
 }
 
-function generateApplicationId(prefix) {
+export function getApplicationById(id) {
+  return getApplications().find((a) => a.id === id) || null;
+}
+
+function genId(prefix) {
   const year = new Date().getFullYear();
+  const rand = Math.floor(10000 + Math.random() * 89999);
 
-  const random = Math.floor(
-    10000 + Math.random() * 89999
-  );
-
-  return `${prefix}-${year}-${random}`;
+  return `${prefix}-${year}-${rand}`;
 }
 
 export function addApplication({
@@ -44,27 +31,18 @@ export function addApplication({
   department,
   applicationId,
   submittedDate,
-  attachedDocuments = [],
 }) {
   const applications = getApplications();
 
   const id =
-    applicationId &&
-    applicationId.trim()
+    applicationId && applicationId.trim()
       ? applicationId.trim()
-      : generateApplicationId(
-          type === 'SCHEME'
-            ? 'SCH'
-            : 'APP'
-        );
+      : genId(type === 'SCHEME' ? 'SCH' : 'APP');
 
   const date =
-    submittedDate ||
-    new Date()
-      .toISOString()
-      .slice(0, 10);
+    submittedDate || new Date().toISOString().slice(0, 10);
 
-  const newApplication = {
+  const newApp = {
     id,
     name,
     type,
@@ -74,7 +52,6 @@ export function addApplication({
     status: 'Submitted',
     submittedDate: date,
     lastUpdated: date,
-    attachedDocuments,
 
     timeline: [
       {
@@ -102,101 +79,30 @@ export function addApplication({
     ],
   };
 
-  const updated = [
-    newApplication,
-    ...applications,
-  ];
+  // Save application
+  const updated = [newApp, ...applications];
 
-  setUserItem(
-    STORAGE_KEYS.APPLICATIONS,
-    updated
-  );
+  setItem(STORAGE_KEYS.APPLICATIONS, updated);
 
-  return newApplication;
+  return newApp;
 }
 
 export function updateApplicationStatus(id, status) {
   const applications = getApplications();
 
-  const date = new Date()
-    .toISOString()
-    .slice(0, 10);
+  const date = new Date().toISOString().slice(0, 10);
 
-  const updated =
-    applications.map(
-      (application) => {
-        if (application.id !== id) {
-          return application;
-        }
-
-        const updatedTimeline =
-          [...(application.timeline || [])];
-
-        const statusTimelineMap = {
-          Submitted: 'Application Submitted',
-          'Under Review': 'Verification',
-          Processing: 'Department Processing',
-          Approved: 'Final Decision',
-          Rejected: 'Final Decision',
-          'Action Required': 'Documents Received',
-        };
-
-        const currentStep =
-          statusTimelineMap[status];
-
-        if (currentStep) {
-          const currentIndex =
-            updatedTimeline.findIndex(
-              (item) =>
-                item.step === currentStep
-            );
-
-          if (currentIndex !== -1) {
-            updatedTimeline[
-              currentIndex
-            ] = {
-              ...updatedTimeline[
-                currentIndex
-              ],
-              done:
-                status === 'Approved' ||
-                status === 'Rejected',
-              current:
-                status !== 'Approved' &&
-                status !== 'Rejected',
-              date,
-            };
-
-            for (
-              let i = 0;
-              i < currentIndex;
-              i++
-            ) {
-              updatedTimeline[i] = {
-                ...updatedTimeline[i],
-                done: true,
-                current: false,
-              };
-            }
-          }
-        }
-
-        return {
-          ...application,
+  const updated = applications.map((a) =>
+    a.id === id
+      ? {
+          ...a,
           status,
           lastUpdated: date,
-          timeline: updatedTimeline,
-        };
-      }
-    );
-
-  setUserItem(
-    STORAGE_KEYS.APPLICATIONS,
-    updated
+        }
+      : a
   );
 
-  return updated.find(
-    (application) =>
-      application.id === id
-  );
+  setItem(STORAGE_KEYS.APPLICATIONS, updated);
+
+  return updated.find((a) => a.id === id) || null;
 }

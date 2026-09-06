@@ -24,7 +24,8 @@ function App() {
       <BrowserRouter>
         <Routes>
 
-          {/* Public pages */}
+          {/* ================= PUBLIC PAGES ================= */}
+
           <Route
             path="/"
             element={<Landing />}
@@ -40,7 +41,8 @@ function App() {
             element={<Officer />}
           />
 
-          {/* Public browsing */}
+          {/* ================= PUBLIC BROWSING ================= */}
+
           <Route
             path="/services"
             element={<Services />}
@@ -61,7 +63,29 @@ function App() {
             element={<SchemeDetail />}
           />
 
-          {/* Protected citizen routes */}
+          {/* ================= MOCK GOVERNMENT PORTALS ================= */}
+
+          {/* Scheme demo form */}
+          <Route
+            path="/mock-portal/scheme/:schemeId"
+            element={
+              <ProtectedRoute>
+                <MockPortal />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Service demo form */}
+          <Route
+            path="/mock-portal/:serviceId"
+            element={
+              <ProtectedRoute>
+                <MockPortal />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= PROTECTED CITIZEN ROUTES ================= */}
 
           <Route
             path="/dashboard"
@@ -77,15 +101,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/mock-portal/:serviceId"
-            element={
-              <ProtectedRoute>
-                <MockPortal />
               </ProtectedRoute>
             }
           />
@@ -135,7 +150,8 @@ function App() {
             }
           />
 
-          {/* Fallback */}
+          {/* ================= FALLBACK ================= */}
+
           <Route
             path="*"
             element={<Landing />}

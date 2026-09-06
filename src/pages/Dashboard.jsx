@@ -28,24 +28,36 @@ const QUICK_ACTIONS = [
     icon: Landmark,
     title: 'Digital Services',
     desc: 'Access government services',
+    borderClass: 'border-blue-200 hover:border-blue-300',
+    iconClass: 'text-blue-700',
+    iconBg: 'bg-blue-50 group-hover:bg-blue-100',
   },
   {
     to: '/schemes',
     icon: Award,
     title: 'Government Schemes',
     desc: 'Find schemes you may be eligible for',
+    borderClass: 'border-amber-200 hover:border-amber-300',
+    iconClass: 'text-amber-700',
+    iconBg: 'bg-amber-50 group-hover:bg-amber-100',
   },
   {
     to: '/applications',
     icon: ClipboardList,
     title: 'Track Applications',
     desc: 'Track all your applications',
+    borderClass: 'border-indigo-200 hover:border-indigo-300',
+    iconClass: 'text-indigo-700',
+    iconBg: 'bg-indigo-50 group-hover:bg-indigo-100',
   },
   {
     to: '/consent',
     icon: ShieldCheck,
     title: 'Consent Center',
     desc: 'Manage your data sharing',
+    borderClass: 'border-green-200 hover:border-green-300',
+    iconClass: 'text-green-700',
+    iconBg: 'bg-green-50 group-hover:bg-green-100',
   },
 ];
 
@@ -84,9 +96,7 @@ function calcProfileCompletion(profile) {
       String(profile[field]).trim() !== ''
   ).length;
 
-  return Math.round(
-    (completed / fields.length) * 100
-  );
+  return Math.round((completed / fields.length) * 100);
 }
 
 function formatActivityDate(date) {
@@ -303,19 +313,29 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
 
         {QUICK_ACTIONS.map(
-          ({ to, icon: Icon, title, desc }) => (
+          ({
+            to,
+            icon: Icon,
+            title,
+            desc,
+            borderClass,
+            iconClass,
+            iconBg,
+          }) => (
 
             <Link
               key={to}
               to={to}
-              className="group rounded-xl border border-gray-200 bg-white p-4 hover:border-navy-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+              className={`group rounded-xl border bg-white p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${borderClass}`}
             >
 
-              <div className="w-10 h-10 rounded-lg bg-gray-50 group-hover:bg-navy-50 flex items-center justify-center mb-3 transition-colors">
+              <div
+                className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${iconBg}`}
+              >
 
                 <Icon
                   size={20}
-                  className="text-navy-700"
+                  className={iconClass}
                 />
 
               </div>
@@ -336,15 +356,11 @@ export default function Dashboard() {
       </div>
 
 
-      {/* =====================================================
-          MAIN CONTENT
-      ====================================================== */}
+      {/* MAIN CONTENT */}
 
       <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mb-8">
 
-        {/* ===================================================
-            LEFT COLUMN
-        ==================================================== */}
+        {/* LEFT COLUMN */}
 
         <div>
 
@@ -745,9 +761,7 @@ export default function Dashboard() {
         </div>
 
 
-        {/* ===================================================
-            RIGHT COLUMN - RECOMMENDED SCHEMES
-        ==================================================== */}
+        {/* RIGHT COLUMN - RECOMMENDED SCHEMES */}
 
         <section>
 
