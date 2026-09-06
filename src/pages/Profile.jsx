@@ -3,6 +3,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import { getProfile, setProfile } from '../services/profileApi';
 import { getCurrentUser } from '../services/authApi';
 import { useToast } from '../components/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const EMPTY_PROFILE = {
   fullName: '',
@@ -49,7 +50,7 @@ function Field({ label, ...props }) {
   );
 }
 
-function Select({ label, options, ...props }) {
+function Select({ label, options, optionLabels, ...props }) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -60,11 +61,11 @@ function Select({ label, options, ...props }) {
         {...props}
         className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500"
       >
-        <option value="">Select</option>
+        <option value="">{optionLabels?.select || 'Select'}</option>
 
-        {options.map((option) => (
+        {options.map((option, index) => (
           <option key={option} value={option}>
-            {option}
+            {optionLabels?.options?.[index] || option}
           </option>
         ))}
       </select>
@@ -87,6 +88,8 @@ function Section({ title, children }) {
 }
 
 export default function Profile() {
+  const { t } = useLanguage();
+
   const currentUser = getCurrentUser();
   const savedProfile = getProfile();
 
@@ -123,125 +126,173 @@ export default function Profile() {
 
     setProfile(form);
 
-    showToast(
-      'Profile saved. Scheme recommendations have been updated.'
-    );
+    showToast(t('profileSavedMessage'));
   }
+
+  const genderOptions = ['Male', 'Female', 'Other'];
+
+  const educationOptions = [
+    'Below Class 10',
+    'Class 10',
+    'Class 12',
+    'ITI',
+    'Diploma',
+    'Undergraduate',
+    'Graduate',
+    'Postgraduate',
+  ];
+
+  const studentStatusOptions = ['Yes', 'No'];
+
+  const employmentOptions = [
+    'Not Employed',
+    'Salaried',
+    'Self-Employed',
+    'Business Owner',
+    'Farmer',
+    'Other',
+  ];
+
+  const incomeOptions = [
+    'Below ₹2.5 Lakh',
+    '₹2.5-5 Lakh',
+    '₹5-10 Lakh',
+    'Above ₹10 Lakh',
+  ];
+
+  const categoryOptions = [
+    'General',
+    'OBC',
+    'SC',
+    'ST',
+    'EWS',
+  ];
+
+  const maritalOptions = [
+    'Unmarried',
+    'Married',
+    'Widowed',
+    'Divorced',
+  ];
 
   return (
     <DashboardLayout>
-
       <h1 className="font-heading text-2xl font-bold text-navy-900 mb-1">
-        My Profile
+        {t('myProfile')}
       </h1>
 
       <p className="text-sm text-gray-500 mb-6">
-        Your profile information is used to provide personalized scheme
-        recommendations.
+        {t('profileDescription')}
       </p>
 
       <form onSubmit={handleSubmit}>
-
         {/* PERSONAL INFORMATION */}
-        <Section title="Personal Information">
-
+        <Section title={t('personalInformation')}>
           <Field
-            label="Full Name"
+            label={t('fullName')}
             value={form.fullName}
             onChange={(e) => update('fullName', e.target.value)}
           />
 
           <Field
-            label="Father's Name"
+            label={t('fatherName')}
             value={form.fatherName}
             onChange={(e) => update('fatherName', e.target.value)}
           />
 
           <Field
-            label="Mother's Name"
+            label={t('motherName')}
             value={form.motherName}
             onChange={(e) => update('motherName', e.target.value)}
           />
 
           <Field
-            label="Date of Birth"
+            label={t('dateOfBirth')}
             type="date"
             value={form.dob}
             onChange={(e) => update('dob', e.target.value)}
           />
 
           <Select
-            label="Gender"
-            options={['Male', 'Female', 'Other']}
+            label={t('gender')}
+            options={genderOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('male'),
+                t('female'),
+                t('other'),
+              ],
+            }}
             value={form.gender}
             onChange={(e) => update('gender', e.target.value)}
           />
 
           <Field
-            label="Mobile Number"
+            label={t('mobileNumber')}
             value={form.mobile}
             onChange={(e) => update('mobile', e.target.value)}
           />
 
           <Field
-            label="Email"
+            label={t('email')}
             type="email"
             value={form.email}
             onChange={(e) => update('email', e.target.value)}
           />
-
         </Section>
 
         {/* ADDRESS */}
-        <Section title="Address">
-
+        <Section title={t('address')}>
           <Field
-            label="Address"
+            label={t('address')}
             value={form.address}
             onChange={(e) => update('address', e.target.value)}
           />
 
           <Field
-            label="State"
+            label={t('state')}
             value={form.state}
             onChange={(e) => update('state', e.target.value)}
           />
 
           <Field
-            label="District"
+            label={t('district')}
             value={form.district}
             onChange={(e) => update('district', e.target.value)}
           />
 
           <Field
-            label="City / Village"
+            label={t('cityVillage')}
             value={form.city}
             onChange={(e) => update('city', e.target.value)}
           />
 
           <Field
-            label="PIN Code"
+            label={t('pinCode')}
             value={form.pincode}
             onChange={(e) => update('pincode', e.target.value)}
           />
-
         </Section>
 
         {/* EDUCATION */}
-        <Section title="Education">
-
+        <Section title={t('education')}>
           <Select
-            label="Education Level"
-            options={[
-              'Below Class 10',
-              'Class 10',
-              'Class 12',
-              'ITI',
-              'Diploma',
-              'Undergraduate',
-              'Graduate',
-              'Postgraduate',
-            ]}
+            label={t('educationLevel')}
+            options={educationOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('belowClass10'),
+                t('class10'),
+                t('class12'),
+                t('iti'),
+                t('diploma'),
+                t('undergraduate'),
+                t('graduate'),
+                t('postgraduate'),
+              ],
+            }}
             value={form.educationLevel}
             onChange={(e) =>
               update('educationLevel', e.target.value)
@@ -249,7 +300,7 @@ export default function Profile() {
           />
 
           <Field
-            label="Institution Name"
+            label={t('institutionName')}
             value={form.institutionName}
             onChange={(e) =>
               update('institutionName', e.target.value)
@@ -257,27 +308,29 @@ export default function Profile() {
           />
 
           <Field
-            label="Course / Class"
+            label={t('courseClass')}
             value={form.course}
             onChange={(e) => update('course', e.target.value)}
           />
 
           <Select
-            label="Student Status"
-            options={['Yes', 'No']}
+            label={t('studentStatus')}
+            options={studentStatusOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [t('yes'), t('no')],
+            }}
             value={form.studentStatus}
             onChange={(e) =>
               update('studentStatus', e.target.value)
             }
           />
-
         </Section>
 
         {/* EMPLOYMENT */}
-        <Section title="Employment">
-
+        <Section title={t('employment')}>
           <Field
-            label="Occupation"
+            label={t('occupation')}
             value={form.occupation}
             onChange={(e) =>
               update('occupation', e.target.value)
@@ -285,28 +338,30 @@ export default function Profile() {
           />
 
           <Select
-            label="Employment Type"
-            options={[
-              'Not Employed',
-              'Salaried',
-              'Self-Employed',
-              'Business Owner',
-              'Farmer',
-              'Other',
-            ]}
+            label={t('employmentType')}
+            options={employmentOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('notEmployed'),
+                t('salaried'),
+                t('selfEmployed'),
+                t('businessOwner'),
+                t('farmer'),
+                t('other'),
+              ],
+            }}
             value={form.employmentType}
             onChange={(e) =>
               update('employmentType', e.target.value)
             }
           />
-
         </Section>
 
         {/* FINANCIAL */}
-        <Section title="Financial">
-
+        <Section title={t('financial')}>
           <Field
-            label="Annual Family Income (₹)"
+            label={t('annualFamilyIncome')}
             type="number"
             value={form.annualIncome}
             onChange={(e) =>
@@ -315,33 +370,39 @@ export default function Profile() {
           />
 
           <Select
-            label="Income Category"
-            options={[
-              'Below ₹2.5 Lakh',
-              '₹2.5-5 Lakh',
-              '₹5-10 Lakh',
-              'Above ₹10 Lakh',
-            ]}
+            label={t('incomeCategory')}
+            options={incomeOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('below25Lakh'),
+                t('income25To5Lakh'),
+                t('income5To10Lakh'),
+                t('above10Lakh'),
+              ],
+            }}
             value={form.incomeCategory}
             onChange={(e) =>
               update('incomeCategory', e.target.value)
             }
           />
-
         </Section>
 
         {/* OTHER */}
-        <Section title="Other">
-
+        <Section title={t('other')}>
           <Select
-            label="Category"
-            options={[
-              'General',
-              'OBC',
-              'SC',
-              'ST',
-              'EWS',
-            ]}
+            label={t('category')}
+            options={categoryOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('general'),
+                t('obc'),
+                t('sc'),
+                t('st'),
+                t('ews'),
+              ],
+            }}
             value={form.category}
             onChange={(e) =>
               update('category', e.target.value)
@@ -349,28 +410,30 @@ export default function Profile() {
           />
 
           <Select
-            label="Marital Status"
-            options={[
-              'Unmarried',
-              'Married',
-              'Widowed',
-              'Divorced',
-            ]}
+            label={t('maritalStatus')}
+            options={maritalOptions}
+            optionLabels={{
+              select: t('select'),
+              options: [
+                t('unmarried'),
+                t('married'),
+                t('widowed'),
+                t('divorced'),
+              ],
+            }}
             value={form.maritalStatus}
             onChange={(e) =>
               update('maritalStatus', e.target.value)
             }
           />
-
         </Section>
 
         <button
           type="submit"
           className="rounded-lg bg-navy-800 hover:bg-navy-900 transition-colors text-white font-semibold px-6 py-2.5 min-h-[44px]"
         >
-          Save Profile
+          {t('saveProfile')}
         </button>
-
       </form>
     </DashboardLayout>
   );

@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import { ToastProvider } from './components/ToastContext';
+import { LanguageProvider } from './context/LanguageContext';
+
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Landing from './pages/Landing';
@@ -20,146 +23,146 @@ import Officer from './pages/Officer';
 
 function App() {
   return (
-    <ToastProvider>
-      <BrowserRouter>
-        <Routes>
+    <LanguageProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
 
-          {/* ================= PUBLIC PAGES ================= */}
+            {/* ================= PUBLIC PAGES ================= */}
 
-          <Route
-            path="/"
-            element={<Landing />}
-          />
+            <Route
+              path="/"
+              element={<Landing />}
+            />
 
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+            <Route
+              path="/login"
+              element={<Login />}
+            />
 
-          <Route
-            path="/officer"
-            element={<Officer />}
-          />
+            <Route
+              path="/officer"
+              element={<Officer />}
+            />
 
-          {/* ================= PUBLIC BROWSING ================= */}
+            {/* ================= PUBLIC BROWSING ================= */}
 
-          <Route
-            path="/services"
-            element={<Services />}
-          />
+            <Route
+              path="/services"
+              element={<Services />}
+            />
 
-          <Route
-            path="/services/:id"
-            element={<ServiceDetail />}
-          />
+            <Route
+              path="/services/:id"
+              element={<ServiceDetail />}
+            />
 
-          <Route
-            path="/schemes"
-            element={<Schemes />}
-          />
+            <Route
+              path="/schemes"
+              element={<Schemes />}
+            />
 
-          <Route
-            path="/schemes/:id"
-            element={<SchemeDetail />}
-          />
+            <Route
+              path="/schemes/:id"
+              element={<SchemeDetail />}
+            />
 
-          {/* ================= MOCK GOVERNMENT PORTALS ================= */}
+            {/* ================= MOCK GOVERNMENT PORTALS ================= */}
 
-          {/* Scheme demo form */}
-          <Route
-            path="/mock-portal/scheme/:schemeId"
-            element={
-              <ProtectedRoute>
-                <MockPortal />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/mock-portal/scheme/:schemeId"
+              element={
+                <ProtectedRoute>
+                  <MockPortal />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Service demo form */}
-          <Route
-            path="/mock-portal/:serviceId"
-            element={
-              <ProtectedRoute>
-                <MockPortal />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/mock-portal/:serviceId"
+              element={
+                <ProtectedRoute>
+                  <MockPortal />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* ================= PROTECTED CITIZEN ROUTES ================= */}
+            {/* ================= PROTECTED CITIZEN ROUTES ================= */}
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/applications"
-            element={
-              <ProtectedRoute>
-                <Applications />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/applications"
+              element={
+                <ProtectedRoute>
+                  <Applications />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/applications/:id"
-            element={
-              <ProtectedRoute>
-                <ApplicationDetail />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/applications/:id"
+              element={
+                <ProtectedRoute>
+                  <ApplicationDetail />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/consent"
-            element={
-              <ProtectedRoute>
-                <Consent />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/consent"
+              element={
+                <ProtectedRoute>
+                  <Consent />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/grievances"
-            element={
-              <ProtectedRoute>
-                <Grievances />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/grievances"
+              element={
+                <ProtectedRoute>
+                  <Grievances />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/help"
-            element={
-              <ProtectedRoute>
-                <Help />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/help"
+              element={
+                <ProtectedRoute>
+                  <Help />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* ================= FALLBACK ================= */}
+            {/* ================= FALLBACK ================= */}
 
-          <Route
-            path="*"
-            element={<Landing />}
-          />
+            <Route
+              path="*"
+              element={<Landing />}
+            />
 
-        </Routes>
-      </BrowserRouter>
-    </ToastProvider>
+          </Routes>
+        </BrowserRouter>
+      </ToastProvider>
+    </LanguageProvider>
   );
 }
 

@@ -9,43 +9,42 @@ import {
 
 import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
-
-const VALUE_PROPS = [
-  {
-    icon: UserCircle,
-    title: 'One Profile Dashboard',
-    description:
-      'Manage your information once and use it across government services and schemes.',
-    iconClass: 'bg-blue-50 text-blue-700',
-    borderClass: 'border-blue-200',
-  },
-  {
-    icon: Sparkles,
-    title: 'Scheme Explorer',
-    description:
-      'Discover government schemes and understand which ones may be relevant to you.',
-    iconClass: 'bg-amber-50 text-amber-700',
-    borderClass: 'border-amber-200',
-  },
-  {
-    icon: LayoutDashboard,
-    title: 'Service Tracker',
-    description:
-      'Track applications from different government services and schemes in one place.',
-    iconClass: 'bg-emerald-50 text-emerald-700',
-    borderClass: 'border-emerald-200',
-  },
-  {
-    icon: MessageCircle,
-    title: 'Help & Support Center',
-    description:
-      'Get guidance and support while navigating government services and applications.',
-    iconClass: 'bg-indigo-50 text-indigo-700',
-    borderClass: 'border-indigo-200',
-  },
-];
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Landing() {
+  const { t } = useLanguage();
+
+  const VALUE_PROPS = [
+    {
+      icon: UserCircle,
+      title: t('oneProfileDashboard'),
+      description: t('oneProfileDashboardDescription'),
+      iconClass: 'bg-blue-50 text-blue-700',
+      borderClass: 'border-blue-200',
+    },
+    {
+      icon: Sparkles,
+      title: t('schemeExplorer'),
+      description: t('schemeExplorerDescription'),
+      iconClass: 'bg-amber-50 text-amber-700',
+      borderClass: 'border-amber-200',
+    },
+    {
+      icon: LayoutDashboard,
+      title: t('serviceTracker'),
+      description: t('serviceTrackerDescription'),
+      iconClass: 'bg-emerald-50 text-emerald-700',
+      borderClass: 'border-emerald-200',
+    },
+    {
+      icon: MessageCircle,
+      title: t('helpSupportCenter'),
+      description: t('helpSupportCenterDescription'),
+      iconClass: 'bg-indigo-50 text-indigo-700',
+      borderClass: 'border-indigo-200',
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f5f9ff] overflow-hidden">
 
@@ -61,26 +60,26 @@ export default function Landing() {
           {/* Decorative shapes */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -left-20 -bottom-28 w-[420px] h-[240px] bg-white/5 rotate-[28deg] rounded-[45%]" />
+
             <div className="absolute right-[-100px] -top-32 w-[500px] h-[260px] bg-white/5 rotate-[25deg] rounded-[50%]" />
+
             <div className="absolute right-[15%] bottom-[-120px] w-[350px] h-[220px] bg-emerald-300/10 rotate-[25deg] rounded-[50%]" />
           </div>
 
-          {/* IMPORTANT:
-              z-50 keeps the search dropdown above the feature cards */}
+          {/* Hero Content */}
           <div className="relative z-50 mx-auto max-w-6xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-28 text-center">
 
             {/* Main Heading */}
             <h1 className="font-heading text-3xl sm:text-5xl lg:text-[52px] font-bold text-white leading-tight max-w-5xl mx-auto">
-              Your Digital Portal to every{' '}
+              {t('yourDigitalPortal')}{' '}
               <span className="text-[#f4c96b]">
-                Government Service.
+                {t('governmentService')}
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="mt-5 text-sm sm:text-base lg:text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
-              Discover government services and schemes, manage your information
-              once, and track your applications from one place.
+              {t('landingDescription')}
             </p>
 
             {/* Search */}
@@ -132,7 +131,7 @@ export default function Landing() {
 
                     {/* Hover arrow */}
                     <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-[#15518b] opacity-0 group-hover:opacity-100 transition-opacity">
-                      Explore
+                      {t('explore')}
                       <ArrowRight size={14} />
                     </div>
 
@@ -157,27 +156,27 @@ export default function Landing() {
 
               <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-semibold text-[#15518b]">
                 <Sparkles size={14} />
-                A smarter citizen experience
+                {t('smarterCitizenExperience')}
               </span>
 
               <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#102f59] mt-5 leading-tight">
-                One profile.
+                {t('oneProfileHeading')}
                 <br />
-                Multiple government services.
+                {t('multipleGovernmentServices')}
               </h2>
 
               <p className="mt-4 text-sm sm:text-base text-gray-600 leading-7 max-w-xl">
-                GovConnect brings discovery, eligibility, applications and
-                tracking together into one simple citizen-centric experience.
+                {t('govconnectDescription')}
               </p>
 
               <Link
                 to="/login"
                 className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#075bb5] hover:bg-[#064c97] text-white font-semibold px-5 py-3 transition-all shadow-sm hover:shadow-md"
               >
-                Get Started
+                {t('getStarted')}
                 <ArrowRight size={18} />
               </Link>
+
             </div>
 
             {/* Right Visual */}
@@ -190,6 +189,7 @@ export default function Landing() {
               <div className="relative z-10 w-[210px] rounded-2xl bg-white border border-blue-100 shadow-xl p-5">
 
                 <div className="flex items-center gap-3 mb-5">
+
                   <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
                     <UserCircle
                       size={22}
@@ -201,6 +201,7 @@ export default function Landing() {
                     <div className="h-2.5 w-20 bg-gray-200 rounded-full" />
                     <div className="h-2 w-14 bg-gray-100 rounded-full mt-2" />
                   </div>
+
                 </div>
 
                 <div className="space-y-3">
@@ -224,19 +225,22 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
 
             <div>
+
               <div className="font-heading text-lg font-bold">
                 GovConnect
               </div>
 
               <p className="text-xs text-blue-100/70 mt-1">
-                One Profile • Multiple Services • A Smarter Tomorrow
+                {t('oneProfileShort')} • {t('multipleServices')} •{' '}
+                {t('smarterTomorrow')}
               </p>
+
             </div>
 
             <div className="flex items-center gap-5 text-xs text-blue-100/80">
-              <span>About GovConnect</span>
-              <span>Data Privacy</span>
-              <span>Help & Support</span>
+              <span>{t('aboutGovConnect')}</span>
+              <span>{t('dataPrivacy')}</span>
+              <span>{t('helpSupport')}</span>
             </div>
 
           </div>
@@ -244,12 +248,11 @@ export default function Landing() {
           <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
 
             <p className="text-xs text-blue-100/60">
-              © {new Date().getFullYear()} GovConnect — Smart India Hackathon prototype.
+              © {new Date().getFullYear()} {t('copyright')}
             </p>
 
             <p className="text-[11px] text-blue-100/50 text-center sm:text-right max-w-lg">
-              Demo prototype. No real Aadhaar, DigiLocker, or government
-              database integration is performed. Data shown is simulated.
+              {t('demoPrototype')}
             </p>
 
           </div>

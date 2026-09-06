@@ -2,8 +2,11 @@ import { Link } from 'react-router-dom';
 import TypeBadge from './TypeBadge';
 import StatusBadge from './StatusBadge';
 import { formatDate } from '../utils/format';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ApplicationCard({ application }) {
+  const { t } = useLanguage();
+
   return (
     <Link
       to={`/applications/${application.id}`}
@@ -12,6 +15,7 @@ export default function ApplicationCard({ application }) {
       <div className="h-1.5 w-full bg-navy-700" />
 
       <div className="p-4">
+
         <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
           <TypeBadge type={application.type} />
           <StatusBadge status={application.status} />
@@ -22,12 +26,13 @@ export default function ApplicationCard({ application }) {
         </h4>
 
         <p className="text-xs text-gray-500 mb-1">
-          Application ID: {application.id}
+          {t('applicationId')} {application.id}
         </p>
 
         <p className="text-xs text-gray-500">
-          Submitted: {formatDate(application.submittedDate)}
+          {t('submitted')} {formatDate(application.submittedDate)}
         </p>
+
       </div>
     </Link>
   );

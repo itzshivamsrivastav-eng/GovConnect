@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import DashboardLayout from '../components/DashboardLayout';
+import { useLanguage } from '../context/LanguageContext';
 import { getProfile } from '../services/profileApi';
 import { getServiceById } from '../services/serviceApi';
 import { getSchemeById } from '../services/schemeApi';
@@ -37,40 +38,41 @@ const EMPTY_FORM = {
 };
 
 const FORM_FIELDS = [
-  { key: 'fullName', label: 'Full Name', type: 'text' },
-  { key: 'dob', label: 'Date of Birth', type: 'date' },
-  { key: 'mobile', label: 'Mobile Number', type: 'tel' },
-  { key: 'email', label: 'Email Address', type: 'email' },
-  { key: 'fatherName', label: "Father's Name", type: 'text' },
-  { key: 'motherName', label: "Mother's Name", type: 'text' },
-  { key: 'gender', label: 'Gender', type: 'text' },
-  { key: 'occupation', label: 'Occupation', type: 'text' },
-  { key: 'address', label: 'Address', type: 'text' },
-  { key: 'state', label: 'State', type: 'text' },
-  { key: 'district', label: 'District', type: 'text' },
-  { key: 'city', label: 'City', type: 'text' },
-  { key: 'pincode', label: 'Pincode', type: 'text' },
+  { key: 'fullName', labelKey: 'fullName', type: 'text' },
+  { key: 'dob', labelKey: 'dateOfBirth', type: 'date' },
+  { key: 'mobile', labelKey: 'mobileNumber', type: 'tel' },
+  { key: 'email', labelKey: 'emailAddress', type: 'email' },
+  { key: 'fatherName', labelKey: 'fatherName', type: 'text' },
+  { key: 'motherName', labelKey: 'motherName', type: 'text' },
+  { key: 'gender', labelKey: 'gender', type: 'text' },
+  { key: 'occupation', labelKey: 'occupation', type: 'text' },
+  { key: 'address', labelKey: 'address', type: 'text' },
+  { key: 'state', labelKey: 'state', type: 'text' },
+  { key: 'district', labelKey: 'district', type: 'text' },
+  { key: 'city', labelKey: 'city', type: 'text' },
+  { key: 'pincode', labelKey: 'pinCode', type: 'text' },
 ];
 
 const CONSENT_FIELDS = [
-  'Full Name',
-  'Date of Birth',
-  'Mobile Number',
-  'Email Address',
-  'Father’s Name',
-  'Mother’s Name',
-  'Gender',
-  'Occupation',
-  'Address',
-  'State',
-  'District',
-  'City',
-  'Pincode',
+  { key: 'fullName', labelKey: 'fullName' },
+  { key: 'dob', labelKey: 'dateOfBirth' },
+  { key: 'mobile', labelKey: 'mobileNumber' },
+  { key: 'email', labelKey: 'emailAddress' },
+  { key: 'fatherName', labelKey: 'fatherName' },
+  { key: 'motherName', labelKey: 'motherName' },
+  { key: 'gender', labelKey: 'gender' },
+  { key: 'occupation', labelKey: 'occupation' },
+  { key: 'address', labelKey: 'address' },
+  { key: 'state', labelKey: 'state' },
+  { key: 'district', labelKey: 'district' },
+  { key: 'city', labelKey: 'city' },
+  { key: 'pincode', labelKey: 'pinCode' },
 ];
 
 export default function MockPortal() {
   const { serviceId, schemeId } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const service = serviceId ? getServiceById(serviceId) : null;
   const scheme = schemeId ? getSchemeById(schemeId) : null;
@@ -96,11 +98,11 @@ export default function MockPortal() {
           />
 
           <h1 className="font-heading text-xl font-bold text-navy-900">
-            Demo Portal Not Found
+            {t('demoPortalNotFound')}
           </h1>
 
           <p className="mt-2 text-sm text-gray-500">
-            The requested service or scheme could not be found.
+            {t('requestedServiceSchemeNotFound')}
           </p>
 
           <Link
@@ -108,7 +110,7 @@ export default function MockPortal() {
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-navy-800 px-5 py-2.5 text-sm font-semibold text-white"
           >
             <ArrowLeft size={16} />
-            Back
+            {t('back')}
           </Link>
         </div>
       </DashboardLayout>
@@ -169,7 +171,8 @@ export default function MockPortal() {
       department: item.department,
     });
 
-    navigate(`/applications/${application.id}`);
+    setSubmittedApplication(application);
+    setSubmitted(true);
   }
 
   function handleOfficialWebsite() {
@@ -182,7 +185,6 @@ export default function MockPortal() {
     return (
       <DashboardLayout>
         <div className="mx-auto max-w-3xl py-4">
-          {/* Success Header */}
           <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-green-100 bg-green-50 px-6 py-8 text-center sm:px-10">
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
@@ -194,27 +196,24 @@ export default function MockPortal() {
               </div>
 
               <h1 className="mt-5 font-heading text-2xl font-bold text-navy-900 sm:text-3xl">
-                Application Submitted Successfully!
+                {t('applicationSubmittedSuccessfully')}
               </h1>
 
               <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-gray-600">
-                Your application has been successfully recorded on
-                GovConnect. You can now track its status from your
-                dashboard.
+                {t('applicationRecordedSuccessfully')}
               </p>
             </div>
 
-            {/* Application ID */}
             <div className="px-6 py-6 sm:px-10">
               <div className="rounded-xl border border-blue-100 bg-blue-50 p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-blue-500">
-                      Application ID
+                      {t('applicationId')}
                     </p>
 
                     <p className="mt-1 font-mono text-lg font-bold text-navy-900">
-                      {submittedApplication?.id || 'Generating...'}
+                      {submittedApplication?.id || t('generating')}
                     </p>
                   </div>
 
@@ -228,12 +227,11 @@ export default function MockPortal() {
                     className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
                   >
                     <Copy size={15} />
-                    Copy ID
+                    {t('copyId')}
                   </button>
                 </div>
               </div>
 
-              {/* Application Details */}
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div className="rounded-xl border border-gray-200 p-4">
                   <div className="flex items-center gap-3">
@@ -246,7 +244,7 @@ export default function MockPortal() {
 
                     <div className="min-w-0">
                       <p className="text-xs text-gray-400">
-                        Application
+                        {t('application')}
                       </p>
 
                       <p className="mt-1 truncate text-sm font-semibold text-navy-900">
@@ -267,11 +265,11 @@ export default function MockPortal() {
 
                     <div className="min-w-0">
                       <p className="text-xs text-gray-400">
-                        Department
+                        {t('department')}
                       </p>
 
                       <p className="mt-1 truncate text-sm font-semibold text-navy-900">
-                        {item.department || 'Government Department'}
+                        {item.department || t('governmentDepartment')}
                       </p>
                     </div>
                   </div>
@@ -288,7 +286,7 @@ export default function MockPortal() {
 
                     <div>
                       <p className="text-xs text-gray-400">
-                        Submitted On
+                        {t('submittedOn')}
                       </p>
 
                       <p className="mt-1 text-sm font-semibold text-navy-900">
@@ -310,14 +308,14 @@ export default function MockPortal() {
 
                     <div>
                       <p className="text-xs text-gray-400">
-                        Current Status
+                        {t('currentStatus')}
                       </p>
 
                       <div className="mt-1 flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-green-500" />
 
                         <p className="text-sm font-semibold text-green-700">
-                          Submitted
+                          {t('submitted')}
                         </p>
                       </div>
                     </div>
@@ -325,7 +323,6 @@ export default function MockPortal() {
                 </div>
               </div>
 
-              {/* Prototype Notice */}
               <div className="mt-5 flex items-start gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
                 <Info
                   size={18}
@@ -333,13 +330,10 @@ export default function MockPortal() {
                 />
 
                 <p className="text-xs leading-5 text-yellow-800">
-                  This is a prototype submission. No real government
-                  application has been sent. The application is saved
-                  locally in GovConnect for demonstration and tracking.
+                  {t('prototypeSubmissionNotice')}
                 </p>
               </div>
 
-              {/* Actions */}
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
@@ -352,7 +346,7 @@ export default function MockPortal() {
                   }
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-navy-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-navy-900"
                 >
-                  Track Application
+                  {t('trackApplication')}
                   <ArrowRight size={17} />
                 </button>
 
@@ -367,7 +361,7 @@ export default function MockPortal() {
                   }
                   className="rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-navy-800 transition hover:bg-gray-50"
                 >
-                  Back to Details
+                  {t('backToDetails')}
                 </button>
               </div>
 
@@ -377,7 +371,7 @@ export default function MockPortal() {
                   onClick={() => setSubmitted(false)}
                   className="text-sm font-medium text-gray-500 hover:text-navy-800 hover:underline"
                 >
-                  Submit another application
+                  {t('submitAnotherApplication')}
                 </button>
               </div>
             </div>
@@ -389,7 +383,6 @@ export default function MockPortal() {
 
   return (
     <DashboardLayout>
-      {/* Demo warning */}
       <div className="mb-5 flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
         <ShieldCheck
           size={17}
@@ -397,12 +390,12 @@ export default function MockPortal() {
         />
 
         <p>
-          This is a <strong>mock government portal</strong> built for
-          demonstration purposes only. It is not a real government website.
+          {t('mockPortalNoticeBefore')}{' '}
+          <strong>{t('mockGovernmentPortal')}</strong>{' '}
+          {t('mockPortalNoticeAfter')}
         </p>
       </div>
 
-      {/* Header */}
       <div className="mb-6">
         <button
           onClick={() =>
@@ -415,7 +408,7 @@ export default function MockPortal() {
           className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-navy-700 hover:underline"
         >
           <ArrowLeft size={16} />
-          Back to Details
+          {t('backToDetails')}
         </button>
 
         <h1 className="font-heading text-2xl font-bold text-navy-900">
@@ -423,12 +416,11 @@ export default function MockPortal() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500">
-          Application Form — Demo Government Portal
+          {t('applicationFormDemoGovernmentPortal')}
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* ================= FORM ================= */}
         <div className="lg:col-span-2">
           <form
             onSubmit={handleSubmit}
@@ -436,11 +428,11 @@ export default function MockPortal() {
           >
             <div className="mb-6">
               <h2 className="font-heading text-xl font-bold text-navy-900">
-                Applicant Information
+                {t('applicantInformation')}
               </h2>
 
               <p className="mt-1 text-sm text-gray-500">
-                Enter the required information below.
+                {t('enterRequiredInformation')}
               </p>
             </div>
 
@@ -455,7 +447,7 @@ export default function MockPortal() {
                   }
                 >
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                    {field.label}
+                    {t(field.labelKey)}
                   </label>
 
                   <input
@@ -476,32 +468,29 @@ export default function MockPortal() {
 
                   {autofilledFields[field.key] && (
                     <p className="mt-1 text-xs font-medium text-green-600">
-                      ✓ Auto-filled from GovConnect profile
+                      ✓ {t('autoFilledFromProfile')}
                     </p>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Submit */}
             <div className="mt-7 border-t border-gray-200 pt-6">
               <button
                 type="submit"
                 className="w-full rounded-lg bg-navy-800 px-5 py-3 font-semibold text-white transition hover:bg-navy-900"
               >
-                Submit Application
+                {t('submitApplication')}
               </button>
 
               <p className="mt-2 text-center text-xs text-gray-400">
-                Demo submission only — no real application will be sent.
+                {t('demoSubmissionOnly')}
               </p>
             </div>
           </form>
         </div>
 
-        {/* ================= RIGHT SIDEBAR ================= */}
         <div className="space-y-5">
-          {/* Autofill */}
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <button
               type="button"
@@ -509,7 +498,7 @@ export default function MockPortal() {
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3.5 text-base font-semibold text-navy-900 shadow-sm transition hover:bg-orange-600"
             >
               <Zap size={19} />
-              Fill with GovConnect
+              {t('fillWithGovConnect')}
             </button>
 
             <p className="mt-3 flex items-start gap-2 text-xs leading-5 text-gray-500">
@@ -519,13 +508,11 @@ export default function MockPortal() {
               />
 
               <span>
-                Use information already saved in your GovConnect
-                profile to reduce repetitive form filling.
+                {t('govConnectAutofillDescription')}
               </span>
             </p>
           </div>
 
-          {/* Profile status */}
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
@@ -537,79 +524,76 @@ export default function MockPortal() {
 
               <div>
                 <h3 className="font-heading font-semibold text-navy-900">
-                  GovConnect Autofill
+                  {t('govConnectAutofill')}
                 </h3>
 
                 <p className="text-xs text-gray-500">
-                  Profile information
+                  {t('profileInformation')}
                 </p>
               </div>
             </div>
 
             <div className="mt-4 rounded-lg bg-green-50 px-4 py-3">
               <p className="text-sm text-green-700">
-                Profile data available:{' '}
+                {t('profileDataAvailable')}:{' '}
                 <strong>
-                  {profile ? 'Yes' : 'No'}
+                  {profile ? t('yes') : t('no')}
                 </strong>
               </p>
             </div>
           </div>
 
-          {/* Application Information */}
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <h3 className="mb-4 font-heading text-lg font-semibold text-navy-900">
-              Application Information
+              {t('applicationInformation')}
             </h3>
 
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-gray-400">
-                  Type
+                  {t('type')}
                 </p>
 
                 <p className="mt-1 text-sm font-medium text-navy-900">
                   {isScheme
-                    ? 'Government Scheme'
-                    : 'Digital Service'}
+                    ? t('governmentScheme')
+                    : t('digitalServices')}
                 </p>
               </div>
 
               <div>
                 <p className="text-xs text-gray-400">
-                  Department
+                  {t('department')}
                 </p>
 
                 <p className="mt-1 text-sm font-medium text-navy-900">
-                  {item.department || 'Government Department'}
+                  {item.department || t('governmentDepartment')}
                 </p>
               </div>
 
               <div>
                 <p className="text-xs text-gray-400">
-                  Portal
+                  {t('portal')}
                 </p>
 
                 <p className="mt-1 text-sm font-medium text-navy-900">
-                  Government Portal
+                  {t('governmentPortal')}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Official Website */}
           {item.officialUrl && (
             <button
               type="button"
               onClick={handleOfficialWebsite}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-base font-semibold text-navy-900 transition hover:bg-gray-50"
             >
-              Open Official Website
+              {t('openOfficialWebsite')}
               <ExternalLink size={18} />
             </button>
           )}
 
-          {/* Back */}
           <Link
             to={
               isScheme
@@ -618,12 +602,11 @@ export default function MockPortal() {
             }
             className="block text-center text-sm font-medium text-navy-700 hover:underline"
           >
-            Back to Details
+            {t('backToDetails')}
           </Link>
         </div>
       </div>
 
-      {/* ================= CONSENT MODAL ================= */}
       {showConsentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
@@ -637,29 +620,28 @@ export default function MockPortal() {
 
               <div>
                 <h2 className="font-heading text-lg font-bold text-navy-900">
-                  Use GovConnect Auto-Fill?
+                  {t('useGovConnectAutofill')}
                 </h2>
 
                 <p className="text-xs text-gray-500">
-                  Review before filling the form
+                  {t('reviewBeforeFilling')}
                 </p>
               </div>
             </div>
 
             <p className="mb-3 text-sm text-gray-600">
-              GovConnect will use the information already saved
-              in your profile to fill this application form.
+              {t('govConnectWillUseProfile')}
             </p>
 
             <div className="mb-5 max-h-52 overflow-y-auto rounded-lg bg-gray-50 p-4">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Information to be used
+                {t('informationToBeUsed')}
               </p>
 
               <ul className="space-y-2">
                 {CONSENT_FIELDS.map((field) => (
                   <li
-                    key={field}
+                    key={field.key}
                     className="flex items-center gap-2 text-sm text-navy-800"
                   >
                     <CheckCircle2
@@ -667,15 +649,14 @@ export default function MockPortal() {
                       className="shrink-0 text-green-600"
                     />
 
-                    {field}
+                    {t(field.labelKey)}
                   </li>
                 ))}
               </ul>
             </div>
 
             <p className="mb-5 text-xs text-gray-400">
-              This consent and autofill process is simulated
-              for the GovConnect prototype.
+              {t('consentAutofillSimulated')}
             </p>
 
             <div className="flex gap-3">
@@ -684,7 +665,7 @@ export default function MockPortal() {
                 onClick={() => setShowConsentModal(false)}
                 className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                {t('cancel')}
               </button>
 
               <button
@@ -692,7 +673,7 @@ export default function MockPortal() {
                 onClick={handleAllowAndFill}
                 className="flex-1 rounded-lg bg-navy-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-navy-900"
               >
-                Allow & Fill
+                {t('allowAndFill')}
               </button>
             </div>
           </div>

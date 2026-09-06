@@ -8,10 +8,12 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  Languages,
 } from 'lucide-react';
 
 import { login, loginDemo } from '../services/authApi';
 import { useToast } from '../components/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
@@ -21,6 +23,7 @@ export default function Login() {
 
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { language, toggleLanguage, t } = useLanguage();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -32,35 +35,62 @@ export default function Login() {
       return;
     }
 
-    showToast(`Welcome, ${result.user.name}!`);
+    showToast(`${t('welcome')}, ${result.user.name}!`);
     navigate('/dashboard');
   }
 
   function handleDemo() {
     loginDemo();
-    showToast('Logged in with demo account — Aarav Sharma.');
+    showToast(t('demoLoginSuccess'));
     navigate('/dashboard');
   }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#f5f9ff] flex items-center justify-center px-4 py-8">
 
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          type="button"
+          onClick={toggleLanguage}
+          className="flex items-center gap-2 rounded-lg border border-[#dce6f3] bg-white/90 backdrop-blur-sm px-3 py-2 text-xs font-medium text-[#53647d] shadow-sm hover:text-[#092f6b] hover:border-[#b9cbe2] transition-all"
+          aria-label={t('language')}
+          title={t('language')}
+        >
+          <Languages size={14} />
+
+          <span>
+            {language === 'en' ? 'English' : 'हिंदी'}
+          </span>
+
+          <span className="text-gray-300">|</span>
+
+          <span>
+            {language === 'en' ? 'हिंदी' : 'English'}
+          </span>
+        </button>
+      </div>
+
       {/* Background Decorative Shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
 
         {/* Top Right Blue Shapes */}
         <div className="absolute -top-20 -right-24 w-[430px] h-[220px] bg-blue-100/70 rotate-[25deg] rounded-[50%]" />
+
         <div className="absolute -top-28 -right-10 w-[430px] h-[190px] border-[28px] border-blue-200/40 rotate-[25deg] rounded-[50%]" />
 
         {/* Bottom Left Tricolor Inspired Curves */}
         <div className="absolute -bottom-28 -left-32 w-[550px] h-[190px] bg-orange-200/60 rotate-[25deg] rounded-[50%]" />
+
         <div className="absolute -bottom-36 -left-24 w-[550px] h-[170px] bg-white rotate-[25deg] rounded-[50%]" />
+
         <div className="absolute -bottom-44 -left-16 w-[560px] h-[170px] bg-emerald-200/60 rotate-[25deg] rounded-[50%]" />
 
         {/* Right Bottom Building Silhouette */}
         <div className="absolute right-[-80px] bottom-[-40px] opacity-[0.10] text-blue-300">
           <div className="w-[420px] h-[220px] rounded-t-[220px] border-[25px] border-blue-300 relative">
             <div className="absolute left-1/2 -translate-x-1/2 -top-[75px] w-20 h-20 rounded-full border-[15px] border-blue-300" />
+
             <div className="absolute left-10 right-10 top-20 h-24 border-x-[20px] border-blue-300" />
           </div>
         </div>
@@ -88,11 +118,15 @@ export default function Login() {
           </div>
 
           <div className="mt-3 flex items-center gap-3 text-sm sm:text-base text-[#71829d]">
-            <span>One Profile</span>
+            <span>{t('oneProfileShort')}</span>
+
             <span className="text-gray-300">•</span>
-            <span>Multiple Services</span>
+
+            <span>{t('multipleServices')}</span>
+
             <span className="text-gray-300">•</span>
-            <span>A Smarter Tomorrow</span>
+
+            <span>{t('smarterTomorrow')}</span>
           </div>
         </Link>
 
@@ -102,11 +136,11 @@ export default function Login() {
           {/* Heading */}
           <div className="mb-7">
             <h1 className="font-heading text-3xl font-bold text-[#092f6b] mb-2">
-              Login
+              {t('login')}
             </h1>
 
             <p className="text-sm sm:text-base text-[#667892]">
-              Enter your details to access your GovConnect account.
+              {t('loginDescription')}
             </p>
           </div>
 
@@ -122,7 +156,7 @@ export default function Login() {
             {/* Full Name */}
             <div>
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
-                Full Name
+                {t('fullName')}
               </label>
 
               <div className="relative">
@@ -136,7 +170,7 @@ export default function Login() {
                   value={identifier.includes('@') ? '' : identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full h-[49px] rounded-xl border border-[#cfd9e6] bg-white pl-12 pr-4 text-sm text-[#26364d] placeholder:text-[#91a0b4] outline-none transition-all focus:border-[#125bb5] focus:ring-2 focus:ring-blue-100"
-                  placeholder="Enter your full name"
+                  placeholder={t('enterFullName')}
                 />
               </div>
             </div>
@@ -144,7 +178,7 @@ export default function Login() {
             {/* Email / Mobile */}
             <div>
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
-                Email or Mobile Number
+                {t('emailOrMobile')}
               </label>
 
               <div className="relative">
@@ -166,7 +200,7 @@ export default function Login() {
             {/* Password */}
             <div>
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
-                Password
+                {t('password')}
               </label>
 
               <div className="relative">
@@ -188,7 +222,9 @@ export default function Login() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[#71829d] hover:text-[#092f6b] transition-colors"
                   aria-label={
-                    showPassword ? 'Hide password' : 'Show password'
+                    showPassword
+                      ? t('hidePassword')
+                      : t('showPassword')
                   }
                 >
                   {showPassword ? (
@@ -205,7 +241,8 @@ export default function Login() {
               type="submit"
               className="w-full h-[49px] rounded-xl bg-[#075bb5] hover:bg-[#064c97] transition-all text-white font-semibold flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
             >
-              <span>Login</span>
+              <span>{t('login')}</span>
+
               <ArrowRight size={20} />
             </button>
           </form>
@@ -215,7 +252,7 @@ export default function Login() {
             <div className="h-px flex-1 bg-[#e2e7ee]" />
 
             <span className="text-xs font-medium text-[#8b98aa]">
-              OR
+              {t('or')}
             </span>
 
             <div className="h-px flex-1 bg-[#e2e7ee]" />
@@ -228,11 +265,12 @@ export default function Login() {
             className="w-full h-[49px] rounded-xl border border-[#e5c49d] bg-[#fffdfa] text-[#a76627] hover:bg-[#fff8ed] transition-all font-semibold flex items-center justify-center gap-2"
           >
             <User size={20} />
-            <span>Use Demo Account</span>
+
+            <span>{t('useDemoAccount')}</span>
           </button>
 
           <p className="text-xs sm:text-sm text-[#8290a4] mt-4 text-center leading-5">
-            Demo account contains pre-filled mock profile and application data.
+            {t('demoAccountDescription')}
           </p>
         </div>
       </div>

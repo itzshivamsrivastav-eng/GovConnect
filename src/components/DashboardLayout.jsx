@@ -20,45 +20,44 @@ import {
   FileText,
   AlertCircle,
   Check,
+  Accessibility,
+  Languages,
 } from 'lucide-react';
 
-import {
-  getCurrentUser,
-  logout,
-} from '../services/authApi';
-
+import { getCurrentUser, logout } from '../services/authApi';
 import { getApplications } from '../services/applicationApi';
+import { useLanguage } from '../context/LanguageContext';
 
 const NAV_ITEMS = [
   {
     to: '/dashboard',
-    label: 'Dashboard',
+    label: 'dashboard',
     icon: LayoutDashboard,
     end: true,
   },
   {
     to: '/services',
-    label: 'Digital Services',
+    label: 'digitalServices',
     icon: Landmark,
   },
   {
     to: '/schemes',
-    label: 'Government Schemes',
+    label: 'governmentSchemes',
     icon: Award,
   },
   {
     to: '/applications',
-    label: 'My Applications',
+    label: 'myApplications',
     icon: ClipboardList,
   },
   {
     to: '/consent',
-    label: 'Consent Center',
+    label: 'consentCenter',
     icon: ShieldCheck,
   },
   {
     to: '/grievances',
-    label: 'Grievances',
+    label: 'grievances',
     icon: MessageSquareWarning,
   },
 ];
@@ -66,6 +65,7 @@ const NAV_ITEMS = [
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+
   const [readNotifications, setReadNotifications] = useState(() => {
     try {
       return JSON.parse(
@@ -82,6 +82,8 @@ export default function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
+  const { language, toggleLanguage, t } = useLanguage();
+
   /*
    * ============================================================
    * APPLICATIONS
@@ -94,29 +96,27 @@ export default function DashboardLayout({ children }) {
 
   /*
    * ============================================================
-   * CREATE NOTIFICATIONS FROM APPLICATIONS
+   * NOTIFICATIONS
    * ============================================================
    */
 
   const notifications = useMemo(() => {
     return applications
       .map((application) => {
-        let title = 'Application Updated';
+        let title = 'applicationUpdated';
         let icon = FileText;
         let iconBg = 'bg-blue-50';
         let iconColor = 'text-blue-600';
 
-        const status = String(
-          application.status || ''
-        ).toLowerCase();
+        const status = String(application.status || '').toLowerCase();
 
         if (status === 'approved') {
-          title = 'Application Approved';
+          title = 'applicationApproved';
           icon = CheckCircle2;
           iconBg = 'bg-emerald-50';
           iconColor = 'text-emerald-600';
         } else if (status === 'submitted') {
-          title = 'Application Submitted';
+          title = 'applicationSubmitted';
           icon = FileText;
           iconBg = 'bg-blue-50';
           iconColor = 'text-blue-600';
@@ -124,12 +124,12 @@ export default function DashboardLayout({ children }) {
           status === 'processing' ||
           status === 'under review'
         ) {
-          title = 'Application Updated';
+          title = 'applicationUpdated';
           icon = Clock3;
           iconBg = 'bg-amber-50';
           iconColor = 'text-amber-600';
         } else if (status === 'rejected') {
-          title = 'Application Update';
+          title = 'applicationUpdate';
           icon = AlertCircle;
           iconBg = 'bg-red-50';
           iconColor = 'text-red-600';
@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }) {
           id: `${application.id}-${application.status}-${application.lastUpdated}`,
           applicationId: application.id,
           title,
-          message: application.name || 'Your application',
+          message: application.name || t('applications'),
           status: application.status || 'Updated',
           date: application.lastUpdated || application.submittedDate,
           icon,
@@ -147,13 +147,12 @@ export default function DashboardLayout({ children }) {
           iconColor,
         };
       })
-      .sort((a, b) => {
-        return (
+      .sort(
+        (a, b) =>
           new Date(b.date || 0) -
           new Date(a.date || 0)
-        );
-      });
-  }, [applications]);
+      );
+  }, [applications, t]);
 
   /*
    * ============================================================
@@ -181,7 +180,7 @@ export default function DashboardLayout({ children }) {
 
   /*
    * ============================================================
-   * CLOSE NOTIFICATION DROPDOWN ON OUTSIDE CLICK / ESC
+   * CLOSE NOTIFICATION DROPDOWN
    * ============================================================
    */
 
@@ -226,7 +225,7 @@ export default function DashboardLayout({ children }) {
 
   /*
    * ============================================================
-   * MARK ONE NOTIFICATION AS READ
+   * MARK AS READ
    * ============================================================
    */
 
@@ -240,12 +239,6 @@ export default function DashboardLayout({ children }) {
     });
   }
 
-  /*
-   * ============================================================
-   * MARK ALL AS READ
-   * ============================================================
-   */
-
   function markAllAsRead() {
     setReadNotifications(
       notifications.map(
@@ -256,7 +249,7 @@ export default function DashboardLayout({ children }) {
 
   /*
    * ============================================================
-   * OPEN NOTIFICATION
+   * NOTIFICATION CLICK
    * ============================================================
    */
 
@@ -271,26 +264,29 @@ export default function DashboardLayout({ children }) {
 
   /*
    * ============================================================
-   * FORMAT DATE
+   * DATE FORMAT
    * ============================================================
    */
 
   function formatNotificationDate(date) {
     if (!date) {
-      return 'Recently';
+      return t('recently');
     }
 
     const parsedDate = new Date(date);
 
     if (Number.isNaN(parsedDate.getTime())) {
-      return 'Recently';
+      return t('recently');
     }
 
-    return parsedDate.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
+    return parsedDate.toLocaleDateString(
+      language === 'hi' ? 'hi-IN' : 'en-IN',
+      {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }
+    );
   }
 
   /*
@@ -325,10 +321,11 @@ export default function DashboardLayout({ children }) {
     <div className="min-h-screen bg-govgray-100">
 
       {/* =====================================================
-          MOBILE TOP BAR
+          MOBILE BRAND BAR
       ====================================================== */}
 
       <div className="lg:hidden sticky top-0 z-50 bg-navy-900 text-white border-b border-white/10">
+
         <div className="h-16 px-4 flex items-center justify-between">
 
           <Link
@@ -336,6 +333,7 @@ export default function DashboardLayout({ children }) {
             className="flex items-center gap-2"
             onClick={() => setSidebarOpen(false)}
           >
+
             <div className="h-9 w-9 rounded-lg bg-saffron-500 flex items-center justify-center">
               <Landmark size={20} />
             </div>
@@ -346,9 +344,10 @@ export default function DashboardLayout({ children }) {
               </p>
 
               <p className="text-[10px] text-white/60 mt-1">
-                Citizen Portal
+                {t('citizenPortal')}
               </p>
             </div>
+
           </Link>
 
           <button
@@ -367,6 +366,7 @@ export default function DashboardLayout({ children }) {
           </button>
 
         </div>
+
       </div>
 
       {/* =====================================================
@@ -419,13 +419,15 @@ export default function DashboardLayout({ children }) {
             </div>
 
             <div>
+
               <p className="font-heading text-xl font-bold tracking-tight">
                 GovConnect
               </p>
 
               <p className="text-xs text-white/60 mt-0.5">
-                Citizen Portal
+                {t('citizenPortal')}
               </p>
+
             </div>
 
           </Link>
@@ -435,9 +437,11 @@ export default function DashboardLayout({ children }) {
         {/* Section title */}
 
         <div className="px-5 pt-6 pb-2">
+
           <p className="text-[10px] uppercase tracking-[0.16em] font-semibold text-white/40">
-            Citizen Services
+            {t('citizenServices')}
           </p>
+
         </div>
 
         {/* Navigation */}
@@ -447,7 +451,12 @@ export default function DashboardLayout({ children }) {
           <div className="space-y-1">
 
             {NAV_ITEMS.map(
-              ({ to, label, icon: Icon, end }) => {
+              ({
+                to,
+                label,
+                icon: Icon,
+                end,
+              }) => {
 
                 const active = isActive(to, end);
 
@@ -492,7 +501,7 @@ export default function DashboardLayout({ children }) {
                     />
 
                     <span className="flex-1">
-                      {label}
+                      {t(label)}
                     </span>
 
                     {active && (
@@ -509,12 +518,12 @@ export default function DashboardLayout({ children }) {
 
           </div>
 
-          {/* Help & Support */}
+          {/* Help */}
 
           <div className="mt-6 pt-5 border-t border-white/10">
 
             <p className="px-3 mb-2 text-[10px] uppercase tracking-[0.16em] font-semibold text-white/40">
-              Assistance
+              {t('assistance')}
             </p>
 
             <Link
@@ -548,7 +557,7 @@ export default function DashboardLayout({ children }) {
               />
 
               <span>
-                Help & Support
+                {t('helpSupportNav')}
               </span>
 
             </Link>
@@ -583,7 +592,7 @@ export default function DashboardLayout({ children }) {
               />
 
               <span>
-                Logout
+                {t('logout')}
               </span>
 
             </button>
@@ -612,11 +621,11 @@ export default function DashboardLayout({ children }) {
               <div className="min-w-0">
 
                 <p className="text-xs font-semibold text-white">
-                  Secure & Trusted
+                  {t('secureTrusted')}
                 </p>
 
                 <p className="text-[10px] text-white/50 mt-0.5">
-                  Your data stays protected
+                  {t('dataProtected')}
                 </p>
 
               </div>
@@ -635,9 +644,82 @@ export default function DashboardLayout({ children }) {
 
       <div className="lg:ml-72 min-h-screen">
 
-        {/* Header */}
+        {/* ===================================================
+            GLOBAL UTILITY BAR
+            Language + Accessibility available on every page
+        ==================================================== */}
 
-        <header className="sticky top-0 z-30 bg-navy-900 border-b border-navy-800">
+        <div className="sticky top-0 z-40 bg-navy-900 text-white border-b border-white/10">
+
+          <div className="min-h-9 px-4 sm:px-6 lg:px-8 flex items-center justify-between text-xs">
+
+            <span className="hidden sm:block text-white/60">
+              {t('governmentServicesPortal')}
+            </span>
+
+            <div className="ml-auto flex items-center gap-4">
+
+              {/* Accessibility */}
+
+              <span className="flex items-center gap-1.5 text-white/70">
+
+                <Accessibility size={13} />
+
+                <span>
+                  {t('accessibility')}
+                </span>
+
+              </span>
+
+              {/* Language */}
+
+              <button
+                type="button"
+                onClick={toggleLanguage}
+                className="
+                  flex
+                  items-center
+                  gap-1.5
+                  text-white/80
+                  hover:text-white
+                  transition-colors
+                  cursor-pointer
+                "
+                aria-label={t('language')}
+                title={t('language')}
+              >
+
+                <Languages size={13} />
+
+                <span>
+                  {language === 'en'
+                    ? 'English'
+                    : 'हिंदी'}
+                </span>
+
+                <span className="text-white/30">
+                  |
+                </span>
+
+                <span>
+                  {language === 'en'
+                    ? 'हिंदी'
+                    : 'English'}
+                </span>
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ===================================================
+            MAIN HEADER
+        ==================================================== */}
+
+        <header className="sticky top-9 z-30 bg-navy-900 border-b border-navy-800">
 
           <div className="min-h-[88px] px-4 sm:px-6 lg:px-8 flex items-center">
 
@@ -669,26 +751,24 @@ export default function DashboardLayout({ children }) {
                     </span>
 
                     <p className="text-xs text-white/60">
-                      Citizen Portal
+                      {t('citizenPortal')}
                     </p>
 
                   </div>
 
                   <h1 className="mt-1 text-lg sm:text-xl font-heading font-bold text-white truncate">
-                    Government Services & Schemes
+                    {t('governmentServicesSchemes')}
                   </h1>
 
                   <p className="hidden md:block text-xs text-white/60 mt-0.5">
-                    Discover, apply and track government services from one place.
+                    {t('discoverApplyTrack')}
                   </p>
 
                 </div>
 
               </div>
 
-              {/* =================================================
-                  RIGHT HEADER
-              ================================================= */}
+              {/* Right */}
 
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
@@ -723,8 +803,8 @@ export default function DashboardLayout({ children }) {
                       hover:bg-white/15
                       transition-colors
                     "
-                    aria-label="Notifications"
-                    title="Notifications"
+                    aria-label={t('notifications')}
+                    title={t('notifications')}
                   >
 
                     <Bell
@@ -735,8 +815,6 @@ export default function DashboardLayout({ children }) {
                           : 'text-white'
                       }
                     />
-
-                    {/* Unread badge */}
 
                     {unreadCount > 0 && (
                       <span className="
@@ -787,7 +865,7 @@ export default function DashboardLayout({ children }) {
                       "
                     >
 
-                      {/* Dropdown Header */}
+                      {/* Header */}
 
                       <div className="px-4 py-3.5 border-b border-gray-100">
 
@@ -798,19 +876,19 @@ export default function DashboardLayout({ children }) {
                             <div className="flex items-center gap-2">
 
                               <h3 className="text-sm font-bold text-gray-900">
-                                Notifications
+                                {t('notifications')}
                               </h3>
 
                               {unreadCount > 0 && (
                                 <span className="px-1.5 py-0.5 rounded-full bg-saffron-50 text-saffron-700 text-[10px] font-bold">
-                                  {unreadCount} new
+                                  {unreadCount} {t('new')}
                                 </span>
                               )}
 
                             </div>
 
                             <p className="text-[11px] text-gray-500 mt-0.5">
-                              Updates on your applications
+                              {t('updatesApplications')}
                             </p>
 
                           </div>
@@ -831,7 +909,7 @@ export default function DashboardLayout({ children }) {
                               "
                             >
                               <Check size={13} />
-                              Mark all read
+                              {t('markAllRead')}
                             </button>
                           )}
 
@@ -848,18 +926,20 @@ export default function DashboardLayout({ children }) {
                           <div className="px-6 py-10 text-center">
 
                             <div className="mx-auto h-11 w-11 rounded-full bg-gray-100 flex items-center justify-center">
+
                               <Bell
                                 size={19}
                                 className="text-gray-400"
                               />
+
                             </div>
 
                             <p className="mt-3 text-sm font-semibold text-gray-800">
-                              No notifications
+                              {t('noNotifications')}
                             </p>
 
                             <p className="mt-1 text-xs text-gray-500">
-                              You don't have any application updates yet.
+                              {t('noApplicationUpdates')}
                             </p>
 
                           </div>
@@ -918,12 +998,14 @@ export default function DashboardLayout({ children }) {
                                       shrink-0
                                     `}
                                   >
+
                                     <Icon
                                       size={17}
                                       className={
                                         notification.iconColor
                                       }
                                     />
+
                                   </div>
 
                                   {/* Content */}
@@ -933,7 +1015,7 @@ export default function DashboardLayout({ children }) {
                                     <div className="flex items-start justify-between gap-2">
 
                                       <p className="text-xs font-bold text-gray-900">
-                                        {notification.title}
+                                        {t(notification.title)}
                                       </p>
 
                                       {isUnread && (
@@ -994,7 +1076,7 @@ export default function DashboardLayout({ children }) {
                               transition-colors
                             "
                           >
-                            View all applications
+                            {t('viewAllApplications')}
                           </button>
 
                         </div>
@@ -1044,7 +1126,7 @@ export default function DashboardLayout({ children }) {
                     </p>
 
                     <p className="text-[11px] text-white/60 mt-0.5">
-                      View Profile
+                      {t('viewProfile')}
                     </p>
 
                   </div>
@@ -1059,9 +1141,11 @@ export default function DashboardLayout({ children }) {
 
         </header>
 
-        {/* Page Content */}
+        {/* ===================================================
+            PAGE CONTENT
+        ==================================================== */}
 
-        <main className="min-h-[calc(100vh-88px)] bg-govgray-100">
+        <main className="min-h-[calc(100vh-124px)] bg-govgray-100">
 
           <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             {children}

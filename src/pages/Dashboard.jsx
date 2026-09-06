@@ -21,13 +21,14 @@ import { getCurrentUser } from '../services/authApi';
 import { getApplications } from '../services/applicationApi';
 import { getRankedSchemes } from '../services/schemeApi';
 import { getProfile } from '../services/profileApi';
+import { useLanguage } from '../context/LanguageContext';
 
 const QUICK_ACTIONS = [
   {
     to: '/services',
     icon: Landmark,
-    title: 'Digital Services',
-    desc: 'Access government services',
+    titleKey: 'digitalServices',
+    descKey: 'accessGovernmentServices',
     borderClass: 'border-blue-200 hover:border-blue-300',
     iconClass: 'text-blue-700',
     iconBg: 'bg-blue-50 group-hover:bg-blue-100',
@@ -35,8 +36,8 @@ const QUICK_ACTIONS = [
   {
     to: '/schemes',
     icon: Award,
-    title: 'Government Schemes',
-    desc: 'Find schemes you may be eligible for',
+    titleKey: 'governmentSchemes',
+    descKey: 'findEligibleSchemes',
     borderClass: 'border-amber-200 hover:border-amber-300',
     iconClass: 'text-amber-700',
     iconBg: 'bg-amber-50 group-hover:bg-amber-100',
@@ -44,8 +45,8 @@ const QUICK_ACTIONS = [
   {
     to: '/applications',
     icon: ClipboardList,
-    title: 'Track Applications',
-    desc: 'Track all your applications',
+    titleKey: 'trackApplicationsAction',
+    descKey: 'trackAllApplications',
     borderClass: 'border-indigo-200 hover:border-indigo-300',
     iconClass: 'text-indigo-700',
     iconBg: 'bg-indigo-50 group-hover:bg-indigo-100',
@@ -53,8 +54,8 @@ const QUICK_ACTIONS = [
   {
     to: '/consent',
     icon: ShieldCheck,
-    title: 'Consent Center',
-    desc: 'Manage your data sharing',
+    titleKey: 'consentCenter',
+    descKey: 'manageDataSharing',
     borderClass: 'border-green-200 hover:border-green-300',
     iconClass: 'text-green-700',
     iconBg: 'bg-green-50 group-hover:bg-green-100',
@@ -99,7 +100,7 @@ function calcProfileCompletion(profile) {
   return Math.round((completed / fields.length) * 100);
 }
 
-function formatActivityDate(date) {
+function formatActivityDate(date, language) {
   if (!date) return '';
 
   const activityDate = new Date(date);
@@ -108,38 +109,41 @@ function formatActivityDate(date) {
     return date;
   }
 
-  return activityDate.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return activityDate.toLocaleDateString(
+    language === 'hi' ? 'hi-IN' : 'en-IN',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }
+  );
 }
 
-function getActivityInfo(step, application) {
+function getActivityInfo(step, application, t) {
   if (step === 'Application Submitted') {
     return {
-      text: `${application.name} application submitted`,
+      text: `${application.name} ${t('applicationSubmittedActivity')}`,
       icon: CheckCircle2,
     };
   }
 
   if (step === 'Documents Received') {
     return {
-      text: `Documents received for ${application.name}`,
+      text: `${t('documentsReceivedActivity')} ${application.name}`,
       icon: CheckCircle2,
     };
   }
 
   if (step === 'Verification') {
     return {
-      text: `${application.name} is under verification`,
+      text: `${application.name} ${t('underVerificationActivity')}`,
       icon: Clock3,
     };
   }
 
   if (step === 'Department Processing') {
     return {
-      text: `${application.name} is being processed`,
+      text: `${application.name} ${t('beingProcessedActivity')}`,
       icon: Clock3,
     };
   }
@@ -147,31 +151,31 @@ function getActivityInfo(step, application) {
   if (step === 'Final Decision') {
     if (application.status === 'Approved') {
       return {
-        text: `${application.name} application approved`,
+        text: `${application.name} ${t('applicationApprovedActivity')}`,
         icon: CheckCircle2,
       };
     }
 
     if (application.status === 'Rejected') {
       return {
-        text: `${application.name} application rejected`,
+        text: `${application.name} ${t('applicationRejectedActivity')}`,
         icon: Clock3,
       };
     }
 
     return {
-      text: `${application.name} final decision updated`,
+      text: `${application.name} ${t('finalDecisionUpdatedActivity')}`,
       icon: Clock3,
     };
   }
 
   return {
-    text: `${application.name} status updated`,
+    text: `${application.name} ${t('statusUpdatedActivity')}`,
     icon: Clock3,
   };
 }
 
-function buildRecentActivities(applications) {
+function buildRecentActivities(applications, t) {
   if (!applications || applications.length === 0) {
     return [];
   }
@@ -186,7 +190,8 @@ function buildRecentActivities(applications) {
 
       const activityInfo = getActivityInfo(
         step.step,
-        application
+        application,
+        t
       );
 
       activities.push({
@@ -206,7 +211,8 @@ function buildRecentActivities(applications) {
     ) {
       const activityInfo = getActivityInfo(
         'Application Updated',
-        application
+        application,
+        t
       );
 
       activities.push({
@@ -228,6 +234,8 @@ function buildRecentActivities(applications) {
 }
 
 export default function Dashboard() {
+  const { t, language } = useLanguage();
+
   const user = getCurrentUser();
   const applications = getApplications();
   const profile = getProfile();
@@ -263,8 +271,10 @@ export default function Dashboard() {
         )
       : 0;
 
-  const recentActivities =
-    buildRecentActivities(applications);
+  const recentActivities = buildRecentActivities(
+    applications,
+    t
+  );
 
   return (
     <DashboardLayout>
@@ -283,17 +293,18 @@ export default function Dashboard() {
             />
 
             <span className="text-xs font-semibold uppercase tracking-wide text-navy-700">
-              Citizen Dashboard
+              {t('citizenDashboard')}
             </span>
 
           </div>
 
           <h1 className="font-heading text-2xl font-bold text-navy-900">
-            Welcome back, {user?.name || 'Citizen'}!
+            {t('welcomeBack')},{' '}
+            {user?.name || t('citizen')}!
           </h1>
 
           <p className="text-gray-500 text-sm mt-1">
-            Manage your services, schemes and applications from one place.
+            {t('manageServices')}
           </p>
 
         </div>
@@ -302,7 +313,7 @@ export default function Dashboard() {
           to="/profile"
           className="inline-flex items-center justify-center rounded-lg border border-navy-700 text-navy-700 hover:bg-navy-700 hover:text-white transition-colors font-medium text-sm px-4 py-2.5 min-h-[44px]"
         >
-          View My Profile
+          {t('viewMyProfile')}
         </Link>
 
       </div>
@@ -316,13 +327,12 @@ export default function Dashboard() {
           ({
             to,
             icon: Icon,
-            title,
-            desc,
+            titleKey,
+            descKey,
             borderClass,
             iconClass,
             iconBg,
           }) => (
-
             <Link
               key={to}
               to={to}
@@ -332,24 +342,21 @@ export default function Dashboard() {
               <div
                 className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${iconBg}`}
               >
-
                 <Icon
                   size={20}
                   className={iconClass}
                 />
-
               </div>
 
               <p className="text-sm font-semibold text-navy-900">
-                {title}
+                {t(titleKey)}
               </p>
 
               <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                {desc}
+                {t(descKey)}
               </p>
 
             </Link>
-
           )
         )}
 
@@ -373,11 +380,11 @@ export default function Dashboard() {
               <div>
 
                 <h2 className="font-heading text-lg font-semibold text-navy-900">
-                  My Applications
+                  {t('myApplicationsTitle')}
                 </h2>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Track your recent applications
+                  {t('trackRecentApplications')}
                 </p>
 
               </div>
@@ -386,7 +393,7 @@ export default function Dashboard() {
                 to="/applications"
                 className="text-sm text-navy-700 hover:underline flex items-center gap-1"
               >
-                View All
+                {t('viewAll')}
                 <ArrowRight size={14} />
               </Link>
 
@@ -395,14 +402,14 @@ export default function Dashboard() {
             {applications.length === 0 ? (
 
               <EmptyState
-                title="No applications yet"
-                description="Apply for a digital service or scheme to start tracking it here."
+                title={t('noApplicationsYet')}
+                description={t('startTracking')}
                 action={
                   <Link
                     to="/services"
                     className="text-sm font-medium text-navy-700 hover:underline"
                   >
-                    Browse Digital Services
+                    {t('browseDigitalServices')}
                   </Link>
                 }
               />
@@ -413,12 +420,10 @@ export default function Dashboard() {
 
                 {applications.slice(0, 4).map(
                   (app) => (
-
                     <ApplicationCard
                       key={app.id}
                       application={app}
                     />
-
                   )
                 )}
 
@@ -438,11 +443,11 @@ export default function Dashboard() {
               <div>
 
                 <h3 className="font-heading font-semibold text-navy-900">
-                  Application Overview
+                  {t('applicationOverview')}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Your current application status
+                  {t('currentApplicationStatus')}
                 </p>
 
               </div>
@@ -451,7 +456,7 @@ export default function Dashboard() {
                 to="/applications"
                 className="text-xs font-medium text-navy-700 hover:underline"
               >
-                Manage
+                {t('manage')}
               </Link>
 
             </div>
@@ -485,7 +490,7 @@ export default function Dashboard() {
                       </span>
 
                       <span className="text-[11px] text-gray-500">
-                        Applications
+                        {t('applications')}
                       </span>
 
                     </div>
@@ -510,11 +515,11 @@ export default function Dashboard() {
                     <div>
 
                       <p className="text-sm font-medium text-gray-800">
-                        Completed
+                        {t('completed')}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        Approved applications
+                        {t('approvedApplications')}
                       </p>
 
                     </div>
@@ -537,11 +542,11 @@ export default function Dashboard() {
                     <div>
 
                       <p className="text-sm font-medium text-gray-800">
-                        Pending
+                        {t('pending')}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        Submitted or processing
+                        {t('submittedProcessing')}
                       </p>
 
                     </div>
@@ -564,11 +569,11 @@ export default function Dashboard() {
                     <div>
 
                       <p className="text-sm font-medium text-gray-800">
-                        Likely Eligible
+                        {t('likelyEligible')}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        Scheme matches
+                        {t('schemeMatches')}
                       </p>
 
                     </div>
@@ -591,11 +596,11 @@ export default function Dashboard() {
                     <div>
 
                       <p className="text-sm font-medium text-gray-800">
-                        Available
+                        {t('available')}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        Schemes in GovConnect
+                        {t('schemesInGovConnect')}
                       </p>
 
                     </div>
@@ -624,11 +629,11 @@ export default function Dashboard() {
               <div>
 
                 <h3 className="font-heading font-semibold text-navy-900">
-                  Profile Completion
+                  {t('profileCompletion')}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Improve your scheme recommendations
+                  {t('improveRecommendations')}
                 </p>
 
               </div>
@@ -642,7 +647,7 @@ export default function Dashboard() {
             <ProgressBar percent={completion} />
 
             <p className="text-xs text-gray-500 mt-3 mb-4">
-              Complete your profile to get better scheme recommendations.
+              {t('completeProfileDescription')}
             </p>
 
             {completion < 100 && (
@@ -651,7 +656,7 @@ export default function Dashboard() {
                 to="/profile"
                 className="inline-flex items-center justify-center rounded-lg bg-navy-800 hover:bg-navy-900 transition-colors text-white text-sm font-medium px-4 py-2 min-h-[40px]"
               >
-                Complete Profile
+                {t('completeProfile')}
               </Link>
 
             )}
@@ -663,7 +668,7 @@ export default function Dashboard() {
                 <CheckCircle2 size={16} />
 
                 <span>
-                  Your profile is complete.
+                  {t('profileComplete')}
                 </span>
 
               </div>
@@ -682,17 +687,17 @@ export default function Dashboard() {
               <div>
 
                 <h3 className="font-heading font-semibold text-navy-900">
-                  Recent Activity
+                  {t('recentActivity')}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Latest updates from your applications
+                  {t('latestUpdatesApplications')}
                 </p>
 
               </div>
 
               <span className="text-xs font-medium text-gray-400">
-                Latest
+                {t('latest')}
               </span>
 
             </div>
@@ -702,7 +707,7 @@ export default function Dashboard() {
               <div className="rounded-lg bg-gray-50 px-4 py-6 text-center">
 
                 <p className="text-sm text-gray-500">
-                  No recent activity.
+                  {t('noRecentActivity')}
                 </p>
 
               </div>
@@ -743,7 +748,10 @@ export default function Dashboard() {
                         </Link>
 
                         <span className="text-xs text-gray-400 shrink-0">
-                          {formatActivityDate(activity.date)}
+                          {formatActivityDate(
+                            activity.date,
+                            language
+                          )}
                         </span>
 
                       </li>
@@ -770,11 +778,11 @@ export default function Dashboard() {
             <div>
 
               <h2 className="font-heading text-lg font-semibold text-navy-900">
-                Recommended Schemes
+                {t('recommendedSchemes')}
               </h2>
 
               <p className="text-xs text-gray-500 mt-0.5">
-                Based on your profile
+                {t('basedOnProfile')}
               </p>
 
             </div>
@@ -783,7 +791,7 @@ export default function Dashboard() {
               to="/schemes"
               className="text-sm text-navy-700 hover:underline flex items-center gap-1"
             >
-              View All
+              {t('viewAll')}
               <ArrowRight size={14} />
             </Link>
 
@@ -793,13 +801,11 @@ export default function Dashboard() {
 
             {topSchemes.map(
               ({ scheme, match }) => (
-
                 <SchemeCard
                   key={scheme.id}
                   scheme={scheme}
                   match={match}
                 />
-
               )
             )}
 
