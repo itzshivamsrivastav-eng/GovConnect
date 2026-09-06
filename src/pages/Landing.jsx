@@ -1,100 +1,259 @@
-
 import { Link } from 'react-router-dom';
-import { UserCircle, Sparkles, LayoutDashboard } from 'lucide-react';
+import {
+  UserCircle,
+  Sparkles,
+  LayoutDashboard,
+  MessageCircle,
+  Search,
+  ArrowRight,
+} from 'lucide-react';
+
 import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
 
 const VALUE_PROPS = [
   {
     icon: UserCircle,
-    title: 'One Profile',
-    description: 'Enter your common information once and reuse it across government services and schemes.',
+    title: 'One Profile Dashboard',
+    description:
+      'Manage your information once and use it across government services and schemes.',
+    iconClass: 'bg-blue-50 text-blue-700',
+    borderClass: 'border-blue-200',
   },
   {
     icon: Sparkles,
-    title: 'Smart Scheme Discovery',
-    description: 'Find government schemes you may be eligible for, based on your saved profile.',
+    title: 'Scheme Explorer',
+    description:
+      'Discover government schemes and understand which ones may be relevant to you.',
+    iconClass: 'bg-amber-50 text-amber-700',
+    borderClass: 'border-amber-200',
   },
   {
     icon: LayoutDashboard,
-    title: 'One Tracking Place',
-    description: 'Track applications from different government services and schemes in one dashboard.',
+    title: 'Service Tracker',
+    description:
+      'Track applications from different government services and schemes in one place.',
+    iconClass: 'bg-emerald-50 text-emerald-700',
+    borderClass: 'border-emerald-200',
+  },
+  {
+    icon: MessageCircle,
+    title: 'Help & Support Center',
+    description:
+      'Get guidance and support while navigating government services and applications.',
+    iconClass: 'bg-indigo-50 text-indigo-700',
+    borderClass: 'border-indigo-200',
   },
 ];
 
 export default function Landing() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#f5f9ff] overflow-hidden">
+
+      {/* Navbar */}
       <Navbar />
 
-      <section className="bg-white border-b border-gray-100">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <h1 className="font-heading text-3xl sm:text-5xl font-bold text-navy-900 mb-4 leading-tight">
-            One Profile. <span className="text-saffron-600">Every</span> Government Service.
-          </h1>
+      {/* Hero Section */}
+      <section className="relative">
 
-          <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto mb-8">
-            Discover government services and schemes, manage your information once, and track your applications
-            from one place.
-          </p>
+        {/* Hero Background */}
+        <div className="relative overflow-visible bg-gradient-to-r from-[#123f82] via-[#14538d] to-[#157d7a]">
 
-          <div className="max-w-xl mx-auto">
-            <SearchBar large />
+          {/* Decorative shapes */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -left-20 -bottom-28 w-[420px] h-[240px] bg-white/5 rotate-[28deg] rounded-[45%]" />
+            <div className="absolute right-[-100px] -top-32 w-[500px] h-[260px] bg-white/5 rotate-[25deg] rounded-[50%]" />
+            <div className="absolute right-[15%] bottom-[-120px] w-[350px] h-[220px] bg-emerald-300/10 rotate-[25deg] rounded-[50%]" />
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <Link
-              to="/login"
-              className="rounded-lg bg-navy-800 hover:bg-navy-900 transition-colors text-white font-semibold px-6 py-3 min-h-[44px] flex items-center"
-            >
-              Get Started
-            </Link>
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-28 text-center">
 
-            <Link
-              to="/services"
-              className="rounded-lg border border-navy-200 text-navy-800 hover:bg-navy-50 transition-colors font-semibold px-6 py-3 min-h-[44px] flex items-center"
-            >
-              Browse Services
-            </Link>
-          </div>
-        </div>
-      </section>
+            {/* Main Heading */}
+            <h1 className="font-heading text-3xl sm:text-5xl lg:text-[52px] font-bold text-white leading-tight max-w-5xl mx-auto">
+              Your Digital Portal to every{' '}
+              <span className="text-[#f4c96b]">
+                Government Service.
+              </span>
+            </h1>
 
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20 grid gap-6 sm:grid-cols-3">
-        {VALUE_PROPS.map(({ icon: Icon, title, description }) => (
-          <div
-            key={title}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white"
-          >
-            <div className="h-1.5 w-full bg-navy-700" />
+            {/* Subtitle */}
+            <p className="mt-5 text-sm sm:text-base lg:text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              Discover government services and schemes, manage your information
+              once, and track your applications from one place.
+            </p>
 
-            <div className="p-6">
-              <div className="rounded-lg bg-navy-50 p-3 w-fit mb-4">
-                <Icon size={22} className="text-navy-700" />
+            {/* Search */}
+            <div className="relative z-20 max-w-2xl mx-auto mt-9">
+              <div className="bg-white rounded-2xl p-1.5 shadow-[0_15px_35px_rgba(0,0,0,0.20)]">
+                <SearchBar large />
               </div>
-
-              <h3 className="font-heading text-lg font-semibold text-navy-900 mb-2">
-                {title}
-              </h3>
-
-              <p className="text-sm text-gray-600">
-                {description}
-              </p>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Quick Feature Cards */}
+        <div className="relative z-30 mx-auto max-w-6xl px-4 sm:px-6 -mt-10 sm:-mt-12 pb-8">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+            {VALUE_PROPS.map(
+              ({
+                icon: Icon,
+                title,
+                description,
+                iconClass,
+                borderClass,
+              }) => (
+                <div
+                  key={title}
+                  className={`group relative overflow-hidden rounded-2xl border ${borderClass} bg-white shadow-[0_8px_25px_rgba(25,65,120,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(25,65,120,0.16)]`}
+                >
+                  {/* Bottom accent */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#123f82] to-[#188b83] opacity-90" />
+
+                  <div className="p-5 sm:p-6">
+
+                    {/* Icon */}
+                    <div
+                      className={`w-14 h-14 rounded-full flex items-center justify-center mb-5 ${iconClass}`}
+                    >
+                      <Icon size={27} strokeWidth={2} />
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-heading text-lg font-bold text-[#102f59] mb-2">
+                      {title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-sm text-[#64748b] leading-6">
+                      {description}
+                    </p>
+
+                    {/* Small arrow */}
+                    <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-[#15518b] opacity-0 group-hover:opacity-100 transition-opacity">
+                      Explore
+                      <ArrowRight size={14} />
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
+
+          </div>
+        </div>
       </section>
 
-      <footer className="mt-auto border-t border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 text-sm text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>&copy; {new Date().getFullYear()} GovConnect — Smart India Hackathon prototype.</p>
+      {/* Main Information Section */}
+      <section className="mx-auto max-w-6xl w-full px-4 sm:px-6 py-12 sm:py-16">
 
-          <p className="text-xs text-gray-400 text-center sm:text-right max-w-md">
-            This is a demo prototype built for SIH. It does not perform real Aadhaar, DigiLocker, or government
-            database integration — all data shown is simulated using mock data and your browser's local storage.
-          </p>
+        <div className="rounded-3xl bg-white border border-[#dce6f3] shadow-sm overflow-hidden">
+
+          <div className="grid lg:grid-cols-2">
+
+            {/* Left */}
+            <div className="p-7 sm:p-10 lg:p-12">
+
+              <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-semibold text-[#15518b]">
+                <Sparkles size={14} />
+                A smarter citizen experience
+              </span>
+
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#102f59] mt-5 leading-tight">
+                One profile.
+                <br />
+                Multiple government services.
+              </h2>
+
+              <p className="mt-4 text-sm sm:text-base text-gray-600 leading-7 max-w-xl">
+                GovConnect brings discovery, eligibility, applications and
+                tracking together into one simple citizen-centric experience.
+              </p>
+
+              <Link
+                to="/login"
+                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#075bb5] hover:bg-[#064c97] text-white font-semibold px-5 py-3 transition-all shadow-sm hover:shadow-md"
+              >
+                Get Started
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+
+            {/* Right visual */}
+            <div className="relative min-h-[260px] lg:min-h-full bg-gradient-to-br from-[#edf5ff] to-[#e7f8f5] flex items-center justify-center overflow-hidden">
+
+              <div className="absolute w-72 h-72 rounded-full border-[20px] border-blue-100/70" />
+              <div className="absolute w-52 h-52 rounded-full border-[15px] border-emerald-100/70" />
+
+              <div className="relative z-10 w-[210px] rounded-2xl bg-white border border-blue-100 shadow-xl p-5">
+
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <UserCircle
+                      size={22}
+                      className="text-[#15518b]"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="h-2.5 w-20 bg-gray-200 rounded-full" />
+                    <div className="h-2 w-14 bg-gray-100 rounded-full mt-2" />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="h-10 rounded-lg bg-blue-50" />
+                  <div className="h-10 rounded-lg bg-emerald-50" />
+                  <div className="h-10 rounded-lg bg-amber-50" />
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="mt-auto bg-[#123f68] text-white">
+
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-7">
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+
+            <div>
+              <div className="font-heading text-lg font-bold">
+                GovConnect
+              </div>
+
+              <p className="text-xs text-blue-100/70 mt-1">
+                One Profile • Multiple Services • A Smarter Tomorrow
+              </p>
+            </div>
+
+            <div className="flex items-center gap-5 text-xs text-blue-100/80">
+              <span>About GovConnect</span>
+              <span>Data Privacy</span>
+              <span>Help & Support</span>
+            </div>
+
+          </div>
+
+          <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+
+            <p className="text-xs text-blue-100/60">
+              © {new Date().getFullYear()} GovConnect — Smart India Hackathon prototype.
+            </p>
+
+            <p className="text-[11px] text-blue-100/50 text-center sm:text-right max-w-lg">
+              Demo prototype. No real Aadhaar, DigiLocker, or government
+              database integration is performed. Data shown is simulated.
+            </p>
+
+          </div>
+
         </div>
       </footer>
+
     </div>
   );
 }
