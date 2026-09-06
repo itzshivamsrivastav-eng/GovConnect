@@ -4,7 +4,6 @@ import {
   Sparkles,
   LayoutDashboard,
   MessageCircle,
-  Search,
   ArrowRight,
 } from 'lucide-react';
 
@@ -66,7 +65,9 @@ export default function Landing() {
             <div className="absolute right-[15%] bottom-[-120px] w-[350px] h-[220px] bg-emerald-300/10 rotate-[25deg] rounded-[50%]" />
           </div>
 
-          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-28 text-center">
+          {/* IMPORTANT:
+              z-50 keeps the search dropdown above the feature cards */}
+          <div className="relative z-50 mx-auto max-w-6xl px-4 sm:px-6 pt-16 sm:pt-20 pb-24 sm:pb-28 text-center">
 
             {/* Main Heading */}
             <h1 className="font-heading text-3xl sm:text-5xl lg:text-[52px] font-bold text-white leading-tight max-w-5xl mx-auto">
@@ -83,7 +84,7 @@ export default function Landing() {
             </p>
 
             {/* Search */}
-            <div className="relative z-20 max-w-2xl mx-auto mt-9">
+            <div className="relative z-[100] max-w-2xl mx-auto mt-9">
               <div className="bg-white rounded-2xl p-1.5 shadow-[0_15px_35px_rgba(0,0,0,0.20)]">
                 <SearchBar large />
               </div>
@@ -129,11 +130,12 @@ export default function Landing() {
                       {description}
                     </p>
 
-                    {/* Small arrow */}
+                    {/* Hover arrow */}
                     <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-[#15518b] opacity-0 group-hover:opacity-100 transition-opacity">
                       Explore
                       <ArrowRight size={14} />
                     </div>
+
                   </div>
                 </div>
               )
@@ -178,10 +180,11 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Right visual */}
+            {/* Right Visual */}
             <div className="relative min-h-[260px] lg:min-h-full bg-gradient-to-br from-[#edf5ff] to-[#e7f8f5] flex items-center justify-center overflow-hidden">
 
               <div className="absolute w-72 h-72 rounded-full border-[20px] border-blue-100/70" />
+
               <div className="absolute w-52 h-52 rounded-full border-[15px] border-emerald-100/70" />
 
               <div className="relative z-10 w-[210px] rounded-2xl bg-white border border-blue-100 shadow-xl p-5">
