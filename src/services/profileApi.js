@@ -5,11 +5,19 @@ import {
 } from '../utils/storage';
 
 export function getProfile() {
-  return getUserItem(STORAGE_KEYS.PROFILE, null, null);
+  return getUserItem(
+    STORAGE_KEYS.PROFILE,
+    null,
+    null
+  );
 }
 
 export function setProfile(profile) {
-  setUserItem(STORAGE_KEYS.PROFILE, profile);
+  setUserItem(
+    STORAGE_KEYS.PROFILE,
+    profile
+  );
+
   return profile;
 }
 

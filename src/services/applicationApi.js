@@ -1,19 +1,36 @@
-import { getItem, setItem, STORAGE_KEYS } from '../utils/storage';
+import {
+  getUserItem,
+  setUserItem,
+  STORAGE_KEYS,
+} from '../utils/storage';
 
 export function seedApplicationsIfEmpty(seed) {
-  const existing = getItem(STORAGE_KEYS.APPLICATIONS, null);
+  const existing = getUserItem(
+    STORAGE_KEYS.APPLICATIONS,
+    null,
+    null
+  );
 
   if (!existing || existing.length === 0) {
-    setItem(STORAGE_KEYS.APPLICATIONS, seed);
+    setUserItem(
+      STORAGE_KEYS.APPLICATIONS,
+      seed
+    );
   }
 }
 
 export function getApplications() {
-  return getItem(STORAGE_KEYS.APPLICATIONS, []);
+  return getUserItem(
+    STORAGE_KEYS.APPLICATIONS,
+    null,
+    []
+  );
 }
 
 export function getApplicationById(id) {
-  return getApplications().find((a) => a.id === id) || null;
+  return (
+    getApplications().find((a) => a.id === id) || null
+  );
 }
 
 function genId(prefix) {
@@ -40,7 +57,8 @@ export function addApplication({
       : genId(type === 'SCHEME' ? 'SCH' : 'APP');
 
   const date =
-    submittedDate || new Date().toISOString().slice(0, 10);
+    submittedDate ||
+    new Date().toISOString().slice(0, 10);
 
   const newApp = {
     id,
@@ -79,10 +97,12 @@ export function addApplication({
     ],
   };
 
-  // Save application
   const updated = [newApp, ...applications];
 
-  setItem(STORAGE_KEYS.APPLICATIONS, updated);
+  setUserItem(
+    STORAGE_KEYS.APPLICATIONS,
+    updated
+  );
 
   return newApp;
 }
@@ -102,7 +122,12 @@ export function updateApplicationStatus(id, status) {
       : a
   );
 
-  setItem(STORAGE_KEYS.APPLICATIONS, updated);
+  setUserItem(
+    STORAGE_KEYS.APPLICATIONS,
+    updated
+  );
 
-  return updated.find((a) => a.id === id) || null;
+  return (
+    updated.find((a) => a.id === id) || null
+  );
 }
