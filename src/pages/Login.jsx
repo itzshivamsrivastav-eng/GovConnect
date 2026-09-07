@@ -28,8 +28,46 @@ export default function Login() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setError('');
 
-    const result = login({ identifier, password });
+    if (!fullName.trim()) {
+      setError(t('enterFullNameError'));
+      return;
+    }
+
+    if (!identifier.trim()) {
+      setError(t('enterEmailError'));
+      return;
+    }
+
+    const cleanIdentifier = identifier.trim();
+
+    const isEmail = cleanIdentifier.includes('@');
+
+    const isValidEmail =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanIdentifier);
+
+    const isValidMobile =
+      /^[0-9]{10}$/.test(cleanIdentifier);
+
+    if (
+      (isEmail && !isValidEmail) ||
+      (!isEmail && !isValidMobile)
+    ) {
+      setError(t('invalidEmailOrMobile'));
+      return;
+    }
+
+    if (!password.trim()) {
+      setError(t('enterPasswordError'));
+      return;
+    }
+
+    const result = login({
+      name: fullName,
+      identifier: cleanIdentifier,
+      password,
+    });
 
     if (!result.success) {
       setError(result.error);
@@ -90,9 +128,11 @@ export default function Login() {
         {/* Right Bottom Building Silhouette */}
         <div className="absolute right-[-80px] bottom-[-40px] opacity-[0.10] text-blue-300">
           <div className="w-[420px] h-[220px] rounded-t-[220px] border-[25px] border-blue-300 relative">
+
             <div className="absolute left-1/2 -translate-x-1/2 -top-[75px] w-20 h-20 rounded-full border-[15px] border-blue-300" />
 
             <div className="absolute left-10 right-10 top-20 h-24 border-x-[20px] border-blue-300" />
+
           </div>
         </div>
 
@@ -107,6 +147,7 @@ export default function Login() {
           className="flex flex-col items-center justify-center mb-8"
         >
           <div className="flex items-center gap-3">
+
             <LandmarkIcon
               size={38}
               strokeWidth={2.4}
@@ -116,9 +157,11 @@ export default function Login() {
             <span className="font-heading text-[34px] sm:text-[38px] font-bold tracking-tight text-[#092f6b]">
               GovConnect
             </span>
+
           </div>
 
           <div className="mt-3 flex items-center gap-3 text-sm sm:text-base text-[#71829d]">
+
             <span>{t('oneProfileShort')}</span>
 
             <span className="text-gray-300">•</span>
@@ -128,6 +171,7 @@ export default function Login() {
             <span className="text-gray-300">•</span>
 
             <span>{t('smarterTomorrow')}</span>
+
           </div>
         </Link>
 
@@ -136,6 +180,7 @@ export default function Login() {
 
           {/* Heading */}
           <div className="mb-7">
+
             <h1 className="font-heading text-3xl font-bold text-[#092f6b] mb-2">
               {t('login')}
             </h1>
@@ -143,6 +188,7 @@ export default function Login() {
             <p className="text-sm sm:text-base text-[#667892]">
               {t('loginDescription')}
             </p>
+
           </div>
 
           {/* Error */}
@@ -156,11 +202,13 @@ export default function Login() {
 
             {/* Full Name */}
             <div>
+
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
                 {t('fullName')}
               </label>
 
               <div className="relative">
+
                 <User
                   size={21}
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8291a8]"
@@ -169,20 +217,27 @@ export default function Login() {
                 <input
                   type="text"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    setError('');
+                  }}
                   className="w-full h-[49px] rounded-xl border border-[#cfd9e6] bg-white pl-12 pr-4 text-sm text-[#26364d] placeholder:text-[#91a0b4] outline-none transition-all focus:border-[#125bb5] focus:ring-2 focus:ring-blue-100"
                   placeholder={t('enterFullName')}
                 />
+
               </div>
+
             </div>
 
             {/* Email / Mobile */}
             <div>
+
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
                 {t('emailOrMobile')}
               </label>
 
               <div className="relative">
+
                 <Mail
                   size={21}
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8291a8]"
@@ -191,20 +246,27 @@ export default function Login() {
                 <input
                   type="text"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    setError('');
+                  }}
                   className="w-full h-[49px] rounded-xl border border-[#cfd9e6] bg-white pl-12 pr-4 text-sm text-[#26364d] placeholder:text-[#91a0b4] outline-none transition-all focus:border-[#125bb5] focus:ring-2 focus:ring-blue-100"
                   placeholder="you@example.com or 9876543210"
                 />
+
               </div>
+
             </div>
 
             {/* Password */}
             <div>
+
               <label className="block text-sm font-semibold text-[#33445c] mb-2">
                 {t('password')}
               </label>
 
               <div className="relative">
+
                 <Lock
                   size={21}
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-[#53647d]"
@@ -213,7 +275,10 @@ export default function Login() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError('');
+                  }}
                   className="w-full h-[49px] rounded-xl border border-[#cfd9e6] bg-white pl-12 pr-12 text-sm text-[#26364d] placeholder:text-[#91a0b4] outline-none transition-all focus:border-[#125bb5] focus:ring-2 focus:ring-blue-100"
                   placeholder="••••••••"
                 />
@@ -234,7 +299,9 @@ export default function Login() {
                     <Eye size={21} />
                   )}
                 </button>
+
               </div>
+
             </div>
 
             {/* Login Button */}
@@ -246,10 +313,12 @@ export default function Login() {
 
               <ArrowRight size={20} />
             </button>
+
           </form>
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-7">
+
             <div className="h-px flex-1 bg-[#e2e7ee]" />
 
             <span className="text-xs font-medium text-[#8b98aa]">
@@ -257,6 +326,7 @@ export default function Login() {
             </span>
 
             <div className="h-px flex-1 bg-[#e2e7ee]" />
+
           </div>
 
           {/* Demo Account */}
@@ -273,6 +343,7 @@ export default function Login() {
           <p className="text-xs sm:text-sm text-[#8290a4] mt-4 text-center leading-5">
             {t('demoAccountDescription')}
           </p>
+
         </div>
       </div>
     </div>

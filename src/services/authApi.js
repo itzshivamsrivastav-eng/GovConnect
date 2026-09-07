@@ -27,8 +27,8 @@ export function isAuthenticated() {
 }
 
 /*
-  Alias used by pages that need to check whether
-  the citizen is currently logged in.
+Alias used by pages that need to check whether
+the citizen is currently logged in.
 */
 export function isLoggedIn() {
   return !!getCurrentUser();
@@ -83,10 +83,12 @@ export function login({
     user
   );
 
+  const profileKey = `${STORAGE_KEYS.PROFILE}_${cleanIdentifier
+    .toLowerCase()
+    .replace(/[^a-z0-9@._-]/g, '_')}`;
+
   const existingProfile = getItem(
-    `${STORAGE_KEYS.PROFILE}_${cleanIdentifier
-      .toLowerCase()
-      .replace(/[^a-z0-9@._-]/g, '_')}`,
+    profileKey,
     null
   );
 
