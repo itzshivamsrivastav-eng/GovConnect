@@ -16,6 +16,7 @@ import { useToast } from '../components/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Login() {
+  const [fullName, setFullName] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -167,8 +168,8 @@ export default function Login() {
 
                 <input
                   type="text"
-                  value={identifier.includes('@') ? '' : identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   className="w-full h-[49px] rounded-xl border border-[#cfd9e6] bg-white pl-12 pr-4 text-sm text-[#26364d] placeholder:text-[#91a0b4] outline-none transition-all focus:border-[#125bb5] focus:ring-2 focus:ring-blue-100"
                   placeholder={t('enterFullName')}
                 />
