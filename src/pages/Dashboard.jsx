@@ -299,7 +299,7 @@ export default function Dashboard() {
           </div>
 
           <h1 className="font-heading text-2xl font-bold text-navy-900">
-            {t('welcomeBack')},{' '}
+            {t('welcomeBack')}{' '}
             {user?.name || t('citizen')}!
           </h1>
 
