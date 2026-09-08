@@ -21,6 +21,7 @@ export default function Landing() {
       description: t('oneProfileDashboardDescription'),
       iconClass: 'bg-blue-50 text-blue-700',
       borderClass: 'border-blue-200',
+      to: '/profile',
     },
     {
       icon: Sparkles,
@@ -28,6 +29,7 @@ export default function Landing() {
       description: t('schemeExplorerDescription'),
       iconClass: 'bg-amber-50 text-amber-700',
       borderClass: 'border-amber-200',
+      to: '/schemes',
     },
     {
       icon: LayoutDashboard,
@@ -35,6 +37,7 @@ export default function Landing() {
       description: t('serviceTrackerDescription'),
       iconClass: 'bg-emerald-50 text-emerald-700',
       borderClass: 'border-emerald-200',
+      to: '/applications',
     },
     {
       icon: MessageCircle,
@@ -42,6 +45,7 @@ export default function Landing() {
       description: t('helpSupportCenterDescription'),
       iconClass: 'bg-indigo-50 text-indigo-700',
       borderClass: 'border-indigo-200',
+      to: '/help',
     },
   ];
 
@@ -102,10 +106,12 @@ export default function Landing() {
                 description,
                 iconClass,
                 borderClass,
+                to,
               }) => (
-                <div
+                <Link
                   key={title}
-                  className={`group relative overflow-hidden rounded-2xl border ${borderClass} bg-white shadow-[0_8px_25px_rgba(25,65,120,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(25,65,120,0.16)]`}
+                  to={to}
+                  className={`group relative overflow-hidden rounded-2xl border ${borderClass} bg-white shadow-[0_8px_25px_rgba(25,65,120,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(25,65,120,0.16)] block`}
                 >
                   {/* Bottom accent */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#123f82] to-[#188b83] opacity-90" />
@@ -136,7 +142,7 @@ export default function Landing() {
                     </div>
 
                   </div>
-                </div>
+                </Link>
               )
             )}
 
