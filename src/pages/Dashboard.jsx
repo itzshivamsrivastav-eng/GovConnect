@@ -16,6 +16,7 @@ import SchemeCard from '../components/SchemeCard';
 import ProgressBar from '../components/ProgressBar';
 import EmptyState from '../components/EmptyState';
 import UnifiedTrackingBanner from '../components/UnifiedTrackingBanner';
+import AskGovConnect from '../components/AskGovConnect';
 
 import { getCurrentUser } from '../services/authApi';
 import { getApplications } from '../services/applicationApi';
@@ -97,7 +98,9 @@ function calcProfileCompletion(profile) {
       String(profile[field]).trim() !== ''
   ).length;
 
-  return Math.round((completed / fields.length) * 100);
+  return Math.round(
+    (completed / fields.length) * 100
+  );
 }
 
 function formatActivityDate(date, language) {
@@ -110,7 +113,9 @@ function formatActivityDate(date, language) {
   }
 
   return activityDate.toLocaleDateString(
-    language === 'hi' ? 'hi-IN' : 'en-IN',
+    language === 'hi'
+      ? 'hi-IN'
+      : 'en-IN',
     {
       day: '2-digit',
       month: 'short',
@@ -119,31 +124,43 @@ function formatActivityDate(date, language) {
   );
 }
 
-function getActivityInfo(step, application, t) {
+function getActivityInfo(
+  step,
+  application,
+  t
+) {
   if (step === 'Application Submitted') {
     return {
-      text: `${application.name} ${t('applicationSubmittedActivity')}`,
+      text: `${application.name} ${t(
+        'applicationSubmittedActivity'
+      )}`,
       icon: CheckCircle2,
     };
   }
 
   if (step === 'Documents Received') {
     return {
-      text: `${t('documentsReceivedActivity')} ${application.name}`,
+      text: `${t(
+        'documentsReceivedActivity'
+      )} ${application.name}`,
       icon: CheckCircle2,
     };
   }
 
   if (step === 'Verification') {
     return {
-      text: `${application.name} ${t('underVerificationActivity')}`,
+      text: `${application.name} ${t(
+        'underVerificationActivity'
+      )}`,
       icon: Clock3,
     };
   }
 
   if (step === 'Department Processing') {
     return {
-      text: `${application.name} ${t('beingProcessedActivity')}`,
+      text: `${application.name} ${t(
+        'beingProcessedActivity'
+      )}`,
       icon: Clock3,
     };
   }
@@ -151,52 +168,69 @@ function getActivityInfo(step, application, t) {
   if (step === 'Final Decision') {
     if (application.status === 'Approved') {
       return {
-        text: `${application.name} ${t('applicationApprovedActivity')}`,
+        text: `${application.name} ${t(
+          'applicationApprovedActivity'
+        )}`,
         icon: CheckCircle2,
       };
     }
 
     if (application.status === 'Rejected') {
       return {
-        text: `${application.name} ${t('applicationRejectedActivity')}`,
+        text: `${application.name} ${t(
+          'applicationRejectedActivity'
+        )}`,
         icon: Clock3,
       };
     }
 
     return {
-      text: `${application.name} ${t('finalDecisionUpdatedActivity')}`,
+      text: `${application.name} ${t(
+        'finalDecisionUpdatedActivity'
+      )}`,
       icon: Clock3,
     };
   }
 
   return {
-    text: `${application.name} ${t('statusUpdatedActivity')}`,
+    text: `${application.name} ${t(
+      'statusUpdatedActivity'
+    )}`,
     icon: Clock3,
   };
 }
 
-function buildRecentActivities(applications, t) {
-  if (!applications || applications.length === 0) {
+function buildRecentActivities(
+  applications,
+  t
+) {
+  if (
+    !applications ||
+    applications.length === 0
+  ) {
     return [];
   }
 
   const activities = [];
 
   applications.forEach((application) => {
-    const timeline = application.timeline || [];
+    const timeline =
+      application.timeline || [];
 
     timeline.forEach((step) => {
       if (!step.date) return;
 
-      const activityInfo = getActivityInfo(
-        step.step,
-        application,
-        t
-      );
+      const activityInfo =
+        getActivityInfo(
+          step.step,
+          application,
+          t
+        );
 
       activities.push({
         id: `${application.id}-${step.step}-${step.date}`,
-        applicationId: application.id,
+        applicationId:
+          application.id,
         text: activityInfo.text,
         icon: activityInfo.icon,
         date: step.date,
@@ -206,18 +240,22 @@ function buildRecentActivities(applications, t) {
     if (
       application.lastUpdated &&
       !timeline.some(
-        (step) => step.date === application.lastUpdated
+        (step) =>
+          step.date ===
+          application.lastUpdated
       )
     ) {
-      const activityInfo = getActivityInfo(
-        'Application Updated',
-        application,
-        t
-      );
+      const activityInfo =
+        getActivityInfo(
+          'Application Updated',
+          application,
+          t
+        );
 
       activities.push({
         id: `${application.id}-updated-${application.lastUpdated}`,
-        applicationId: application.id,
+        applicationId:
+          application.id,
         text: activityInfo.text,
         icon: activityInfo.icon,
         date: application.lastUpdated,
@@ -228,53 +266,76 @@ function buildRecentActivities(applications, t) {
   return activities
     .sort(
       (a, b) =>
-        new Date(b.date) - new Date(a.date)
+        new Date(b.date) -
+        new Date(a.date)
     )
     .slice(0, 5);
 }
 
 export default function Dashboard() {
-  const { t, language } = useLanguage();
+  const { t, language } =
+    useLanguage();
 
   const user = getCurrentUser();
-  const applications = getApplications();
+  const applications =
+    getApplications();
   const profile = getProfile();
 
-  const ranked = getRankedSchemes();
-  const topSchemes = ranked.slice(0, 3);
+  const ranked =
+    getRankedSchemes();
 
-  const completion = calcProfileCompletion(profile);
+  const topSchemes =
+    ranked.slice(0, 3);
 
-  const completedCount = applications.filter(
-    (app) => app.status === 'Approved'
-  ).length;
+  const completion =
+    calcProfileCompletion(
+      profile
+    );
 
-  const pendingCount = applications.filter(
-    (app) =>
-      app.status === 'Submitted' ||
-      app.status === 'Under Review' ||
-      app.status === 'Processing'
-  ).length;
+  const completedCount =
+    applications.filter(
+      (app) =>
+        app.status ===
+        'Approved'
+    ).length;
 
-  const totalApplications = applications.length;
+  const pendingCount =
+    applications.filter(
+      (app) =>
+        app.status ===
+          'Submitted' ||
+        app.status ===
+          'Under Review' ||
+        app.status ===
+          'Processing'
+    ).length;
 
-  const eligibleSchemes = ranked.filter(
-    ({ match }) => match.likelyEligible
-  ).length;
+  const totalApplications =
+    applications.length;
 
-  const availableSchemes = ranked.length;
+  const eligibleSchemes =
+    ranked.filter(
+      ({ match }) =>
+        match.likelyEligible
+    ).length;
+
+  const availableSchemes =
+    ranked.length;
 
   const completedPercentage =
     totalApplications > 0
       ? Math.round(
-          (completedCount / totalApplications) * 100
+          (completedCount /
+            totalApplications) *
+            100
         )
       : 0;
 
-  const recentActivities = buildRecentActivities(
-    applications,
-    t
-  );
+  const recentActivities =
+    buildRecentActivities(
+      applications,
+      t
+    );
 
   return (
     <DashboardLayout>
@@ -282,31 +343,32 @@ export default function Dashboard() {
       {/* HEADER */}
 
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
         <div>
-
           <div className="flex items-center gap-2 mb-1">
-
             <Sparkles
               size={17}
               className="text-amber-500"
             />
 
             <span className="text-xs font-semibold uppercase tracking-wide text-navy-700">
-              {t('citizenDashboard')}
+              {t(
+                'citizenDashboard'
+              )}
             </span>
-
           </div>
 
           <h1 className="font-heading text-2xl font-bold text-navy-900">
             {t('welcomeBack')}{' '}
-            {user?.name || t('citizen')}!
+            {user?.name ||
+              t('citizen')}
+            !
           </h1>
 
           <p className="text-gray-500 text-sm mt-1">
-            {t('manageServices')}
+            {t(
+              'manageServices'
+            )}
           </p>
-
         </div>
 
         <Link
@@ -315,14 +377,11 @@ export default function Dashboard() {
         >
           {t('viewMyProfile')}
         </Link>
-
       </div>
-
 
       {/* QUICK ACTIONS */}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
-
         {QUICK_ACTIONS.map(
           ({
             to,
@@ -338,13 +397,14 @@ export default function Dashboard() {
               to={to}
               className={`group rounded-xl border bg-white p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${borderClass}`}
             >
-
               <div
                 className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${iconBg}`}
               >
                 <Icon
                   size={20}
-                  className={iconClass}
+                  className={
+                    iconClass
+                  }
                 />
               </div>
 
@@ -355,13 +415,10 @@ export default function Dashboard() {
               <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                 {t(descKey)}
               </p>
-
             </Link>
           )
         )}
-
       </div>
-
 
       {/* MAIN CONTENT */}
 
@@ -374,19 +431,19 @@ export default function Dashboard() {
           {/* MY APPLICATIONS */}
 
           <section className="mb-6">
-
             <div className="flex items-center justify-between mb-3">
-
               <div>
-
                 <h2 className="font-heading text-lg font-semibold text-navy-900">
-                  {t('myApplicationsTitle')}
+                  {t(
+                    'myApplicationsTitle'
+                  )}
                 </h2>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {t('trackRecentApplications')}
+                  {t(
+                    'trackRecentApplications'
+                  )}
                 </p>
-
               </div>
 
               <Link
@@ -394,62 +451,62 @@ export default function Dashboard() {
                 className="text-sm text-navy-700 hover:underline flex items-center gap-1"
               >
                 {t('viewAll')}
-                <ArrowRight size={14} />
+                <ArrowRight
+                  size={14}
+                />
               </Link>
-
             </div>
 
-            {applications.length === 0 ? (
-
+            {applications.length ===
+            0 ? (
               <EmptyState
-                title={t('noApplicationsYet')}
-                description={t('startTracking')}
+                title={t(
+                  'noApplicationsYet'
+                )}
+                description={t(
+                  'startTracking'
+                )}
                 action={
                   <Link
                     to="/services"
                     className="text-sm font-medium text-navy-700 hover:underline"
                   >
-                    {t('browseDigitalServices')}
+                    {t(
+                      'browseDigitalServices'
+                    )}
                   </Link>
                 }
               />
-
             ) : (
-
               <div className="grid sm:grid-cols-2 gap-4">
-
-                {applications.slice(0, 4).map(
-                  (app) => (
+                {applications
+                  .slice(0, 4)
+                  .map((app) => (
                     <ApplicationCard
                       key={app.id}
                       application={app}
                     />
-                  )
-                )}
-
+                  ))}
               </div>
-
             )}
-
           </section>
-
 
           {/* APPLICATION OVERVIEW */}
 
           <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm mb-6">
-
             <div className="flex items-center justify-between mb-5">
-
               <div>
-
                 <h3 className="font-heading font-semibold text-navy-900">
-                  {t('applicationOverview')}
+                  {t(
+                    'applicationOverview'
+                  )}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {t('currentApplicationStatus')}
+                  {t(
+                    'currentApplicationStatus'
+                  )}
                 </p>
-
               </div>
 
               <Link
@@ -458,21 +515,19 @@ export default function Dashboard() {
               >
                 {t('manage')}
               </Link>
-
             </div>
-
 
             <div className="grid md:grid-cols-2 gap-6 items-center">
 
               {/* PIE CHART */}
 
               <div className="flex items-center justify-center">
-
                 <div
                   className="relative w-36 h-36 rounded-full"
                   style={{
                     background:
-                      totalApplications === 0
+                      totalApplications ===
+                      0
                         ? 'conic-gradient(#e5e7eb 0deg 360deg)'
                         : `conic-gradient(
                             #1f2937 0deg ${completedPercentage * 3.6}deg,
@@ -480,271 +535,257 @@ export default function Dashboard() {
                           )`,
                   }}
                 >
-
                   <div className="absolute inset-0 flex items-center justify-center">
-
                     <div className="w-24 h-24 rounded-full bg-white flex flex-col items-center justify-center">
-
                       <span className="text-2xl font-bold text-navy-900">
-                        {totalApplications}
+                        {
+                          totalApplications
+                        }
                       </span>
 
                       <span className="text-[11px] text-gray-500">
-                        {t('applications')}
+                        {t(
+                          'applications'
+                        )}
                       </span>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
-
 
               {/* STATUS */}
 
               <div className="space-y-3">
 
                 <div className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3">
-
                   <div className="flex items-center gap-3">
-
                     <span className="w-3 h-3 rounded-full bg-navy-800" />
 
                     <div>
-
                       <p className="text-sm font-medium text-gray-800">
-                        {t('completed')}
+                        {t(
+                          'completed'
+                        )}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        {t('approvedApplications')}
+                        {t(
+                          'approvedApplications'
+                        )}
                       </p>
-
                     </div>
-
                   </div>
 
                   <span className="text-lg font-bold text-navy-900">
-                    {completedCount}
+                    {
+                      completedCount
+                    }
                   </span>
-
                 </div>
 
-
                 <div className="flex items-center justify-between rounded-lg bg-amber-50 px-4 py-3">
-
                   <div className="flex items-center gap-3">
-
                     <span className="w-3 h-3 rounded-full bg-amber-500" />
 
                     <div>
-
                       <p className="text-sm font-medium text-gray-800">
                         {t('pending')}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        {t('submittedProcessing')}
+                        {t(
+                          'submittedProcessing'
+                        )}
                       </p>
-
                     </div>
-
                   </div>
 
                   <span className="text-lg font-bold text-amber-700">
-                    {pendingCount}
+                    {
+                      pendingCount
+                    }
                   </span>
-
                 </div>
 
-
                 <div className="flex items-center justify-between rounded-lg bg-green-50 px-4 py-3">
-
                   <div className="flex items-center gap-3">
-
                     <span className="w-3 h-3 rounded-full bg-green-500" />
 
                     <div>
-
                       <p className="text-sm font-medium text-gray-800">
-                        {t('likelyEligible')}
+                        {t(
+                          'likelyEligible'
+                        )}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        {t('schemeMatches')}
+                        {t(
+                          'schemeMatches'
+                        )}
                       </p>
-
                     </div>
-
                   </div>
 
                   <span className="text-lg font-bold text-green-700">
-                    {eligibleSchemes}
+                    {
+                      eligibleSchemes
+                    }
                   </span>
-
                 </div>
 
-
                 <div className="flex items-center justify-between rounded-lg bg-blue-50 px-4 py-3">
-
                   <div className="flex items-center gap-3">
-
                     <span className="w-3 h-3 rounded-full bg-blue-500" />
 
                     <div>
-
                       <p className="text-sm font-medium text-gray-800">
-                        {t('available')}
+                        {t(
+                          'available'
+                        )}
                       </p>
 
                       <p className="text-xs text-gray-500">
-                        {t('schemesInGovConnect')}
+                        {t(
+                          'schemesInGovConnect'
+                        )}
                       </p>
-
                     </div>
-
                   </div>
 
                   <span className="text-lg font-bold text-blue-700">
-                    {availableSchemes}
+                    {
+                      availableSchemes
+                    }
                   </span>
-
                 </div>
 
               </div>
-
             </div>
-
           </section>
-
 
           {/* PROFILE COMPLETION */}
 
           <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm mb-6">
-
             <div className="flex items-center justify-between mb-3">
-
               <div>
-
                 <h3 className="font-heading font-semibold text-navy-900">
-                  {t('profileCompletion')}
+                  {t(
+                    'profileCompletion'
+                  )}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {t('improveRecommendations')}
+                  {t(
+                    'improveRecommendations'
+                  )}
                 </p>
-
               </div>
 
               <span className="text-sm font-bold text-navy-800">
                 {completion}%
               </span>
-
             </div>
 
-            <ProgressBar percent={completion} />
+            <ProgressBar
+              percent={
+                completion
+              }
+            />
 
             <p className="text-xs text-gray-500 mt-3 mb-4">
-              {t('completeProfileDescription')}
+              {t(
+                'completeProfileDescription'
+              )}
             </p>
 
             {completion < 100 && (
-
               <Link
                 to="/profile"
                 className="inline-flex items-center justify-center rounded-lg bg-navy-800 hover:bg-navy-900 transition-colors text-white text-sm font-medium px-4 py-2 min-h-[40px]"
               >
-                {t('completeProfile')}
+                {t(
+                  'completeProfile'
+                )}
               </Link>
-
             )}
 
             {completion === 100 && (
-
               <div className="flex items-center gap-2 text-sm text-green-700">
-
-                <CheckCircle2 size={16} />
+                <CheckCircle2
+                  size={16}
+                />
 
                 <span>
-                  {t('profileComplete')}
+                  {t(
+                    'profileComplete'
+                  )}
                 </span>
-
               </div>
-
             )}
-
           </section>
-
 
           {/* RECENT ACTIVITY */}
 
           <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-
             <div className="flex items-center justify-between mb-4">
-
               <div>
-
                 <h3 className="font-heading font-semibold text-navy-900">
-                  {t('recentActivity')}
+                  {t(
+                    'recentActivity'
+                  )}
                 </h3>
 
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {t('latestUpdatesApplications')}
+                  {t(
+                    'latestUpdatesApplications'
+                  )}
                 </p>
-
               </div>
 
               <span className="text-xs font-medium text-gray-400">
                 {t('latest')}
               </span>
-
             </div>
 
-            {recentActivities.length === 0 ? (
-
+            {recentActivities.length ===
+            0 ? (
               <div className="rounded-lg bg-gray-50 px-4 py-6 text-center">
-
                 <p className="text-sm text-gray-500">
-                  {t('noRecentActivity')}
+                  {t(
+                    'noRecentActivity'
+                  )}
                 </p>
-
               </div>
-
             ) : (
-
               <ul className="grid md:grid-cols-2 gap-3">
-
                 {recentActivities.map(
                   (activity) => {
-
-                    const Icon = activity.icon;
+                    const Icon =
+                      activity.icon;
 
                     return (
                       <li
-                        key={activity.id}
+                        key={
+                          activity.id
+                        }
                         className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 hover:bg-gray-100 px-4 py-3 transition-colors"
                       >
-
                         <Link
                           to={`/applications/${activity.applicationId}`}
                           className="flex items-center gap-3 min-w-0 flex-1"
                         >
-
                           <div className="w-7 h-7 rounded-full bg-navy-50 flex items-center justify-center shrink-0">
-
                             <Icon
                               size={14}
                               className="text-navy-700"
                             />
-
                           </div>
 
                           <span className="text-sm text-gray-700 truncate">
-                            {activity.text}
+                            {
+                              activity.text
+                            }
                           </span>
-
                         </Link>
 
                         <span className="text-xs text-gray-400 shrink-0">
@@ -753,38 +794,31 @@ export default function Dashboard() {
                             language
                           )}
                         </span>
-
                       </li>
                     );
-
                   }
                 )}
-
               </ul>
-
             )}
-
           </section>
-
         </div>
-
 
         {/* RIGHT COLUMN - RECOMMENDED SCHEMES */}
 
         <section>
-
           <div className="flex items-center justify-between mb-3">
-
             <div>
-
               <h2 className="font-heading text-lg font-semibold text-navy-900">
-                {t('recommendedSchemes')}
+                {t(
+                  'recommendedSchemes'
+                )}
               </h2>
 
               <p className="text-xs text-gray-500 mt-0.5">
-                {t('basedOnProfile')}
+                {t(
+                  'basedOnProfile'
+                )}
               </p>
-
             </div>
 
             <Link
@@ -792,33 +826,42 @@ export default function Dashboard() {
               className="text-sm text-navy-700 hover:underline flex items-center gap-1"
             >
               {t('viewAll')}
-              <ArrowRight size={14} />
+              <ArrowRight
+                size={14}
+              />
             </Link>
-
           </div>
 
           <div className="space-y-4">
-
             {topSchemes.map(
-              ({ scheme, match }) => (
+              ({
+                scheme,
+                match,
+              }) => (
                 <SchemeCard
-                  key={scheme.id}
-                  scheme={scheme}
-                  match={match}
+                  key={
+                    scheme.id
+                  }
+                  scheme={
+                    scheme
+                  }
+                  match={
+                    match
+                  }
                 />
               )
             )}
-
           </div>
-
         </section>
-
       </div>
-
 
       {/* UNIFIED TRACKING */}
 
       <UnifiedTrackingBanner />
+
+      {/* FLOATING ASK GOVCONNECT */}
+
+      <AskGovConnect />
 
     </DashboardLayout>
   );
